@@ -3,10 +3,21 @@ import dotenv from "dotenv";
 import http from "http";
 import express, { Express } from "express";
 import morgan from "morgan";
+import mongoose from "mongoose";
 import { userRouter } from "./users";
+import { uri } from "../database.config";
+
 // load the environment variables from the .env file
 dotenv.config({
   path: ".env.local"
+});
+
+// Database connection
+mongoose.connect(uri);
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "connection error: "));
+db.once("open", function () {
+  console.log("Connected successfully to database");
 });
 
 const router: Express = express();
@@ -39,7 +50,7 @@ router.use((req, res, next) => {
 router.use("/users", userRouter);
 
 /** Error handling */
-router.use((req, res, next) => {
+router.use((req, res) => {
   const error = new Error("not found");
   return res.status(404).json({
     message: error.message
@@ -48,7 +59,7 @@ router.use((req, res, next) => {
 
 /** Server */
 const httpServer = http.createServer(router);
-const PORT: any = process.env.PORT ?? 6060;
+const PORT = 6060;
 httpServer.listen(PORT, () =>
   console.log(`The server is running on port ${PORT}`)
 );
