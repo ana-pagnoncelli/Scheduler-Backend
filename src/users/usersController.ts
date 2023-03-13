@@ -9,6 +9,13 @@ interface Post {
   body: String;
 }
 
+interface Post {
+    userId: Number;
+    id: Number;
+    title: String;
+    body: String;
+  }
+
 // getting all posts
 const getPosts = async (req: Request, res: Response, next: NextFunction) => {
   // get some posts

@@ -3,8 +3,7 @@ import dotenv from "dotenv";
 import http from "http";
 import express, { Express } from "express";
 import morgan from "morgan";
-import routes from "./users/usersRouters";
-
+import { userRouter } from "./users";
 // load the environment variables from the .env file
 dotenv.config({
   path: ".env.local"
@@ -37,7 +36,7 @@ router.use((req, res, next) => {
 });
 
 /** Routes */
-router.use("/", routes);
+router.use("/users", userRouter);
 
 /** Error handling */
 router.use((req, res, next) => {

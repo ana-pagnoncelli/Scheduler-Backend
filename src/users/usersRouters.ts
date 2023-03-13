@@ -4,10 +4,10 @@ import controller from "./usersController";
 
 const router = Router();
 
-router.get("/posts", controller.getPosts);
-router.get("/posts/:id", controller.getPost);
-router.put("/posts/:id", controller.updatePost);
-router.delete("/posts/:id", controller.deletePost);
-router.post("/posts", controller.addPost);
+router.get("/", controller.getPosts);
+router.get("/:id", controller.getPost);
+router.put("/:id", controller.updatePost);
+router.delete("/:id", controller.deletePost);
+router.post("/", controller.addPost);
 
-export = router;
+export { router as userRouter };
