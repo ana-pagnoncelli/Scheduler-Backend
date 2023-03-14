@@ -1,16 +1,22 @@
-// const app = require("./app");
-// const http = require("http");
-// const port = 8045;
-// app.set("port", port);
-// const server = http.createServer(app);
-// beforeAll((done) => {
-//   /*db.sequelize.sync({ force: true, logging: console.log }).then(() => {
-// //server.listen(port);
-// done();
-// });*/
-//   server.listen(port);
-//   done();
-// });
-// afterAll(async () => {
-//   await server.close();
-// });
+import mongoose from "mongoose";
+import http from "http";
+import { router } from "./router.setup";
+import { uriTest } from "../database.config";
+
+const httpServer = http.createServer(router);
+const PORT = 6060;
+
+beforeAll(async () => {
+  httpServer.listen(PORT, () =>
+    console.log(`The server is running on port ${PORT}`)
+  );
+  await mongoose.connect(uriTest);
+});
+
+afterAll(async () => {
+  await mongoose.connection.dropDatabase();
+  await mongoose.connection.close();
+  httpServer.close();
+});
+
+export { httpServer };

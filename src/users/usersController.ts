@@ -14,10 +14,10 @@ export const addUser = async (request: Request, response: Response) => {
 };
 
 export const getUsers = async (request: Request, response: Response) => {
-  // const users = await User.find({});
+  const users = await User.find({});
 
   try {
-    response.send(["Elie", "Matt", "Joel", "Michael"]);
+    response.send(users);
   } catch (error) {
     response.status(500).send(error);
   }

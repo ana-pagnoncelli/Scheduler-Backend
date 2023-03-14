@@ -12,7 +12,8 @@ dotenv.config({
 
 // Database connection
 mongoose.connect(uri);
-const db = mongoose.connection;
+
+export const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error: "));
 db.once("open", function () {
   console.log("Connected successfully to database");
