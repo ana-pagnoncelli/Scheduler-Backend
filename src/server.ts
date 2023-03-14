@@ -19,7 +19,7 @@ db.once("open", function () {
 });
 
 /** Server */
-const httpServer = http.createServer(router);
+export const httpServer = http.createServer(router);
 const PORT = 6060;
 httpServer.listen(PORT, () =>
   console.log(`The server is running on port ${PORT}`)
