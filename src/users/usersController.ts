@@ -3,9 +3,8 @@ import { Request, Response } from "express";
 import { User } from "./user";
 
 export const addUser = async (request: Request, response: Response) => {
-  const user = new User(request.body);
-
   try {
+    const user = new User(request.body);
     await user.save();
     response.send(user);
   } catch (error) {
@@ -14,10 +13,25 @@ export const addUser = async (request: Request, response: Response) => {
 };
 
 export const getUsers = async (request: Request, response: Response) => {
-  const users = await User.find({});
-
   try {
+    const users = await User.find({});
     response.send(users);
+  } catch (error) {
+    response.status(500).send(error);
+  }
+};
+
+export const login = async (request: Request, response: Response) => {
+  try {
+    const requestUser = new User(request.body);
+    const databaseUser = new User(
+      await User.findOne({ email: requestUser.email })
+    );
+    if (databaseUser && requestUser.password === databaseUser.password) {
+      response.status(200).send();
+    } else {
+      response.status(401).send();
+    }
   } catch (error) {
     response.status(500).send(error);
   }

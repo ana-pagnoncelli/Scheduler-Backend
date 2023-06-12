@@ -51,9 +51,8 @@
         <a href="#usage">Usage</a>
         <ul>
             <li><a href="#how-to-run-the-project-and-basic-scripts">How to run the project and basic scripts</a></li>
-            <li><a href="#cypress">Cypress</a></li>
-            <li><a href="#storybook">Storybook</a></li>
-            <li><a href="#husky">Husky</a></li>
+            <li><a href="#swagger">Swagger</a></li>
+            <li><a href="#frontend">Frontend</a></li>
         </ul>
     </li>
     <li><a href="#roadmap">Roadmap</a></li>
@@ -152,6 +151,10 @@ Here you are going to find some tools/features the project has and how to use th
     Check if the code is within the eslint rules.
 
 ### Swagger
+
+### Frontend
+
+You can check out the frontend application and how to use it here: [https://github.com/Ana2877/Scheduler](https://github.com/Ana2877/Scheduler)
 
 <!-- ROADMAP -->
 
