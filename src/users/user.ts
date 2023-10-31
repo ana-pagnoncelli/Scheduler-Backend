@@ -17,6 +17,18 @@ const UserSchema = new mongoose.Schema({
   age: {
     type: Number,
     default: 0
+  },
+  phone: {
+    type: Number,
+    default: 0
+  },
+  gender: {
+    type: String,
+    default: ""
+  },
+  plan: {
+    type: String,
+    default: ""
   }
 });
 

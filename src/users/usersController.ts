@@ -21,6 +21,16 @@ export const getUsers = async (request: Request, response: Response) => {
   }
 };
 
+export const getUser = async (request: Request, response: Response) => {
+  try {
+    const userEmail = request.params.email;
+    const user = new User(await User.findOne({ email: userEmail }));
+    response.send(user);
+  } catch (error) {
+    response.status(500).send(error);
+  }
+};
+
 export const login = async (request: Request, response: Response) => {
   try {
     const requestUser = new User(request.body);
@@ -28,7 +38,7 @@ export const login = async (request: Request, response: Response) => {
       await User.findOne({ email: requestUser.email })
     );
     if (databaseUser && requestUser.password === databaseUser.password) {
-      response.status(200).send();
+      response.status(200).send(databaseUser);
     } else {
       response.status(401).send();
     }

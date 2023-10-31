@@ -16,12 +16,12 @@ const userDataWithMissingName = {
 
 const wrongEmailLogin = {
   email: "wrong@email",
-  password: "test123",
+  password: "test123"
 };
 
 const wrongPasswordLogin = {
   email: "test@test",
-  password: "wrongPassword",
+  password: "wrongPassword"
 };
 
 describe("Users", () => {
