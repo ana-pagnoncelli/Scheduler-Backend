@@ -8,6 +8,13 @@ const userData = {
   age: 32
 };
 
+const updatedUserData = {
+  name: "Test",
+  email: "test@test",
+  password: "test123",
+  age: 25
+};
+
 const userDataWithMissingName = {
   email: "test@test",
   password: "test123",
@@ -39,9 +46,27 @@ describe("Users", () => {
   });
 
   describe("GET / ", () => {
-    it("Should return the created user", async () => {
+    it("Should return the all the users", async () => {
       const response = await request(httpServer).get("/users");
       expect(response.body).toMatchObject([userData]);
+      expect(response.statusCode).toBe(200);
+    });
+  });
+
+  describe("GET /:email ", () => {
+    it("Should return the searched user", async () => {
+      const response = await request(httpServer).get("/users/test@test");
+      expect(response.body).toMatchObject(userData);
+      expect(response.statusCode).toBe(200);
+    });
+  });
+
+  describe("PUT /:email ", () => {
+    it("Should return the user updated", async () => {
+      const response = await request(httpServer)
+        .put("/users/test@test")
+        .send(updatedUserData);
+      expect(response.body).toMatchObject(updatedUserData);
       expect(response.statusCode).toBe(200);
     });
   });
