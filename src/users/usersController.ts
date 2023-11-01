@@ -25,7 +25,24 @@ export const getUser = async (request: Request, response: Response) => {
   try {
     const userEmail = request.params.email;
     const user = new User(await User.findOne({ email: userEmail }));
-    response.send(user);
+    response.status(200).send(user);
+  } catch (error) {
+    response.status(500).send(error);
+  }
+};
+
+export const updateUser = async (request: Request, response: Response) => {
+  try {
+    const userEmail = request.params.email;
+
+    if (request.body.email) {
+      delete request.body.email;
+    }
+    const data = { $set: request.body };
+    const user = await User.findOneAndUpdate({ email: userEmail }, data, {
+      new: true
+    });
+    response.status(200).send(user);
   } catch (error) {
     response.status(500).send(error);
   }
