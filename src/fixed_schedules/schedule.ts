@@ -8,7 +8,16 @@ const ScheduleSchema = new mongoose.Schema({
   },
   week_day: {
     type: String,
-    required: true
+    required: true,
+    enum: [
+      "MONDAY",
+      "TUESDAY",
+      "WEDNESDAY",
+      "THURSDAY",
+      "FRIDAY",
+      "SATURDAY",
+      "SUNDAY"
+    ]
   },
   hour_of_the_day: {
     type: String,

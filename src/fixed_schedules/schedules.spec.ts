@@ -1,99 +1,65 @@
 import request from "supertest";
 import { httpServer } from "../setupTests";
 
-const userData = {
-  name: "Test",
-  email: "test@test",
-  password: "test123",
-  age: 32
+const scheduleData = {
+  id: "1",
+  week_day: "MONDAY",
+  hour_of_the_day: "18:00",
+  users_list: []
 };
 
-const updatedUserData = {
-  name: "Test",
-  email: "test@test",
-  password: "test123",
-  age: 25
+const scheduleWithMissingData = {
+  id: "1",
+  hour_of_the_day: "18:00",
+  users_list: []
 };
 
-const userDataWithMissingName = {
-  email: "test@test",
-  password: "test123",
-  age: 32
+const updatedScheduleData = {
+  id: "1",
+  week_day: "TUESDAY",
+  hour_of_the_day: "18:00",
+  users_list: []
 };
 
-const wrongEmailLogin = {
-  email: "wrong@email",
-  password: "test123"
-};
-
-const wrongPasswordLogin = {
-  email: "test@test",
-  password: "wrongPassword"
-};
-
-describe("Users", () => {
+describe("Schedules", () => {
   describe("POST / ", () => {
-    it("Should create a user when all required fields are given", async () => {
-      const response = await request(httpServer).post("/users").send(userData);
+    it("Should create a schedule when all required fields are given", async () => {
+      const response = await request(httpServer)
+        .post("/schedules")
+        .send(scheduleData);
       expect(response.statusCode).toBe(200);
     });
-    it("Should not create a user when a field is missing", async () => {
+    it("Should not create a schedule when a field is missing", async () => {
       const response = await request(httpServer)
-        .post("/users")
-        .send(userDataWithMissingName);
+        .post("/schedules")
+        .send(scheduleWithMissingData);
       expect(response.statusCode).toBe(500);
     });
   });
 
-  describe("GET / ", () => {
-    it("Should return the all the users", async () => {
-      const response = await request(httpServer).get("/users");
-      expect(response.body).toMatchObject([userData]);
+  describe("GET /:id ", () => {
+    it("Should return the searched schedule", async () => {
+      await request(httpServer).post("/schedules").send(scheduleData);
+      const response = await request(httpServer).get("/schedules/1");
+      expect(response.body).toMatchObject(scheduleData);
       expect(response.statusCode).toBe(200);
     });
   });
 
-  describe("GET /:email ", () => {
-    it("Should return the searched user", async () => {
-      const response = await request(httpServer).get("/users/test@test");
-      expect(response.body).toMatchObject(userData);
+  describe("PUT /:id ", () => {
+    it("Should return the schedule updated", async () => {
+      const response = await request(httpServer)
+        .put("/schedules/1")
+        .send(updatedScheduleData);
+      expect(response.body).toMatchObject(updatedScheduleData);
       expect(response.statusCode).toBe(200);
     });
   });
 
-  describe("PUT /:email ", () => {
-    it("Should return the user updated", async () => {
-      const response = await request(httpServer)
-        .put("/users/test@test")
-        .send(updatedUserData);
-      expect(response.body).toMatchObject(updatedUserData);
+  describe("DELETE /:id ", () => {
+    it("Should delete the schedule", async () => {
+      const response = await request(httpServer).delete("/schedules/1");
       expect(response.statusCode).toBe(200);
-    });
-  });
-
-  describe("POST /login ", () => {
-    it("Should return the status 200 if the email and password are correct", async () => {
-      const response = await request(httpServer)
-        .post("/users/login")
-        .send(userData);
-
-      expect(response.statusCode).toBe(200);
-    });
-
-    it("Should return the status 401 if the email is wrong", async () => {
-      const response = await request(httpServer)
-        .post("/users/login")
-        .send(wrongEmailLogin);
-
-      expect(response.statusCode).toBe(401);
-    });
-
-    it("Should return the status 401 if the password is wrong", async () => {
-      const response = await request(httpServer)
-        .post("/users/login")
-        .send(wrongPasswordLogin);
-
-      expect(response.statusCode).toBe(401);
     });
   });
 });

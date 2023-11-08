@@ -24,3 +24,23 @@ export const updateSchedule = async (request: Request, response: Response) => {
     response.status(500).send(error);
   }
 };
+
+export const deleteSchedule = async (request: Request, response: Response) => {
+  try {
+    const scheduleId = request.params.id;
+    const schedule = await Schedule.findOneAndDelete({ id: scheduleId });
+    response.status(200).send(schedule);
+  } catch (error) {
+    response.status(500).send(error);
+  }
+};
+
+export const getSchedule = async (request: Request, response: Response) => {
+  try {
+    const scheduleId = request.params.id;
+    const schedule = await Schedule.findOne({ id: scheduleId });
+    response.status(200).send(schedule);
+  } catch (error) {
+    response.status(500).send(error);
+  }
+};
