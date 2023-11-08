@@ -1,25 +1,10 @@
 import request from "supertest";
 import { httpServer } from "../setupTests";
-
-const scheduleData = {
-  id: "1",
-  week_day: "MONDAY",
-  hour_of_the_day: "18:00",
-  users_list: []
-};
-
-const scheduleWithMissingData = {
-  id: "1",
-  hour_of_the_day: "18:00",
-  users_list: []
-};
-
-const updatedScheduleData = {
-  id: "1",
-  week_day: "TUESDAY",
-  hour_of_the_day: "18:00",
-  users_list: []
-};
+import {
+  scheduleData,
+  scheduleWithMissingData,
+  updatedScheduleData
+} from "./fixtures";
 
 describe("Schedules", () => {
   describe("POST / ", () => {

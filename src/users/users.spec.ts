@@ -1,35 +1,12 @@
 import request from "supertest";
 import { httpServer } from "../setupTests";
-
-const userData = {
-  name: "Test",
-  email: "test@test",
-  password: "test123",
-  age: 32
-};
-
-const updatedUserData = {
-  name: "Test",
-  email: "test@test",
-  password: "test123",
-  age: 25
-};
-
-const userDataWithMissingName = {
-  email: "test@test",
-  password: "test123",
-  age: 32
-};
-
-const wrongEmailLogin = {
-  email: "wrong@email",
-  password: "test123"
-};
-
-const wrongPasswordLogin = {
-  email: "test@test",
-  password: "wrongPassword"
-};
+import {
+  updatedUserData,
+  userData,
+  userDataWithMissingName,
+  wrongEmailLogin,
+  wrongPasswordLogin
+} from "./fixtures";
 
 describe("Users", () => {
   describe("POST / ", () => {
