@@ -8,6 +8,11 @@ const scheduleBaseData = {
 
 export const scheduleData = {
   ...scheduleBaseData,
+  users_list: []
+};
+
+export const scheduleDataWithOneUser = {
+  ...scheduleBaseData,
   users_list: [userData2.email]
 };
 
@@ -19,13 +24,15 @@ export const scheduleWithMissingData = {
 
 export const updatedScheduleData = {
   ...scheduleBaseData,
-  users_list: [userData2.email, userData.email]
+  users_list: [userData.email, userData2.email]
 };
 
 export const userDataWithSchedule = {
-  name: "Test",
-  email: "test@test",
-  password: "test123",
-  age: 32,
+  ...userData,
+  fixed_schedules: [scheduleBaseData]
+};
+
+export const userData2WithSchedule = {
+  ...userData,
   fixed_schedules: [scheduleBaseData]
 };

@@ -2,11 +2,12 @@ import request from "supertest";
 import { httpServer } from "../setupTests";
 import {
   scheduleData,
+  scheduleDataWithOneUser,
   scheduleWithMissingData,
   updatedScheduleData,
   userDataWithSchedule
 } from "./fixtures";
-import { userData } from "../users/fixtures";
+import { userData, userData2 } from "../users/fixtures";
 
 describe("Schedules", () => {
   describe("POST / ", () => {
@@ -53,11 +54,16 @@ describe("Schedules", () => {
   describe("PUT addUser/:userEmail/InSchedule/:scheduleId ", () => {
     it("Should update the schedule and the user", async () => {
       await request(httpServer).post("/users").send(userData);
+      await request(httpServer).post("/users").send(userData2);
 
       await request(httpServer).post("/schedules").send(scheduleData);
 
-      const response = await request(httpServer).put(
+      await request(httpServer).put(
         `/schedules/addUser/${userData.email}/InSchedule/${scheduleData.id}`
+      );
+
+      const response = await request(httpServer).put(
+        `/schedules/addUser/${userData2.email}/InSchedule/${scheduleData.id}`
       );
 
       expect(response.body).toMatchObject(updatedScheduleData);
@@ -68,6 +74,23 @@ describe("Schedules", () => {
       );
 
       expect(userResponse.body).toMatchObject(userDataWithSchedule);
+    });
+  });
+
+  describe("PUT removeUser/:userEmail/FromSchedule/:scheduleId ", () => {
+    it("Should update the schedule and the user", async () => {
+      const response = await request(httpServer).put(
+        `/schedules/removeUser/${userData.email}/FromSchedule/${scheduleData.id}`
+      );
+
+      expect(response.body).toMatchObject(scheduleDataWithOneUser);
+      expect(response.statusCode).toBe(200);
+
+      const userResponse = await request(httpServer).get(
+        `/users/${userData.email}`
+      );
+
+      expect(userResponse.body).toMatchObject(userData);
     });
   });
 });

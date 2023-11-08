@@ -79,3 +79,31 @@ export const addUserInSchedule = async (
     response.status(500).send(error);
   }
 };
+
+export const removeUserFromSchedule = async (
+  request: Request,
+  response: Response
+) => {
+  try {
+    const { userEmail, scheduleId } = request.params;
+
+    const schedule = new Schedule(
+      await Schedule.findOneAndUpdate(
+        { id: scheduleId },
+        { $pull: { users_list: userEmail } },
+        {
+          new: true
+        }
+      )
+    );
+
+    await User.findOneAndUpdate(
+      { email: userEmail },
+      { $pull: { fixed_schedules: { id: { $in: scheduleId } } } }
+    );
+
+    response.status(200).send(schedule);
+  } catch (error) {
+    response.status(500).send(error);
+  }
+};
