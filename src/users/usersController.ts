@@ -31,6 +31,16 @@ export const getUser = async (request: Request, response: Response) => {
   }
 };
 
+export const deleteUser = async (request: Request, response: Response) => {
+  try {
+    const userEmail = request.params.email;
+    const user = await User.findOneAndDelete({ email: userEmail });
+    response.status(200).send(user);
+  } catch (error) {
+    response.status(500).send(error);
+  }
+};
+
 export const updateUser = async (request: Request, response: Response) => {
   try {
     const userEmail = request.params.email;

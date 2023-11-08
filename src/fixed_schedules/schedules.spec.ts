@@ -3,8 +3,10 @@ import { httpServer } from "../setupTests";
 import {
   scheduleData,
   scheduleWithMissingData,
-  updatedScheduleData
+  updatedScheduleData,
+  userDataWithSchedule
 } from "./fixtures";
+import { userData } from "../users/fixtures";
 
 describe("Schedules", () => {
   describe("POST / ", () => {
@@ -45,6 +47,27 @@ describe("Schedules", () => {
     it("Should delete the schedule", async () => {
       const response = await request(httpServer).delete("/schedules/1");
       expect(response.statusCode).toBe(200);
+    });
+  });
+
+  describe("PUT addUser/:userEmail/InSchedule/:scheduleId ", () => {
+    it("Should update the schedule and the user", async () => {
+      await request(httpServer).post("/users").send(userData);
+
+      await request(httpServer).post("/schedules").send(scheduleData);
+
+      const response = await request(httpServer).put(
+        `/schedules/addUser/${userData.email}/InSchedule/${scheduleData.id}`
+      );
+
+      expect(response.body).toMatchObject(updatedScheduleData);
+      expect(response.statusCode).toBe(200);
+
+      const userResponse = await request(httpServer).get(
+        `/users/${userData.email}`
+      );
+
+      expect(userResponse.body).toMatchObject(userDataWithSchedule);
     });
   });
 });

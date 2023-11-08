@@ -4,13 +4,15 @@ import {
   addSchedule,
   updateSchedule,
   deleteSchedule,
-  getSchedule
+  getSchedule,
+  addUserInSchedule
 } from "./schedulesController";
 
 const router = Router();
 
 router.post("/", addSchedule);
 router.put("/:id", updateSchedule);
+router.put("/addUser/:userEmail/InSchedule/:scheduleId", addUserInSchedule);
 router.get("/:id", getSchedule);
 router.delete("/:id", deleteSchedule);
 

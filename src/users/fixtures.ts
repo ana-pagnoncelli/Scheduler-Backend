@@ -5,6 +5,13 @@ export const userData = {
   age: 32
 };
 
+export const userData2 = {
+  name: "Test2",
+  email: "test@test2",
+  password: "test123",
+  age: 30
+};
+
 export const updatedUserData = {
   name: "Test",
   email: "test@test",

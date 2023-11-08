@@ -73,4 +73,13 @@ describe("Users", () => {
       expect(response.statusCode).toBe(401);
     });
   });
+
+  describe("DELETE /:email ", () => {
+    it("Should delete the user", async () => {
+      const response = await request(httpServer).delete(
+        `/schedules/${userData.email}`
+      );
+      expect(response.statusCode).toBe(200);
+    });
+  });
 });
