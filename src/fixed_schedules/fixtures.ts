@@ -3,7 +3,8 @@ import { userData, userData2 } from "../users/fixtures";
 const scheduleBaseData = {
   id: "1",
   week_day: "MONDAY",
-  hour_of_the_day: "18:00"
+  hour_of_the_day: "18:00",
+  number_of_spots: 2
 };
 
 export const scheduleData = {

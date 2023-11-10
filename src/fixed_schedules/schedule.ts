@@ -25,6 +25,10 @@ const ScheduleSchema = new mongoose.Schema({
   },
   users_list: {
     type: Array
+  },
+  number_of_spots: {
+    type: Number,
+    required: true
   }
 });
 

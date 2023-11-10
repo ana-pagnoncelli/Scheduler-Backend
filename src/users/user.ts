@@ -41,6 +41,13 @@ const UserSchema = new mongoose.Schema({
       hour_of_the_day: String,
       week_day: String
     }
+  ],
+  variable_schedules: [
+    {
+      id: String,
+      hour_of_the_day: String,
+      day: String
+    }
   ]
 });
 
