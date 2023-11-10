@@ -48,6 +48,13 @@ const UserSchema = new mongoose.Schema({
       hour_of_the_day: String,
       day: String
     }
+  ],
+  canceled_schedules: [
+    {
+      id: String,
+      hour_of_the_day: String,
+      day: String
+    }
   ]
 });
 

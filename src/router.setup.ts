@@ -3,6 +3,7 @@ import morgan from "morgan";
 import { userRouter } from "./users";
 import { variableScheduleRouter } from "./variable_schedules";
 import { scheduleRouter } from "./fixed_schedules";
+import { canceledScheduleRouter } from "./canceled_schedules";
 
 export const router: Express = express();
 
@@ -34,6 +35,7 @@ router.use((req, res, next) => {
 router.use("/users", userRouter);
 router.use("/schedules", scheduleRouter);
 router.use("/variableSchedules", variableScheduleRouter);
+router.use("/canceledSchedules", canceledScheduleRouter);
 
 /** Error handling */
 router.use((req, res) => {
