@@ -32,4 +32,12 @@ const ScheduleSchema = new mongoose.Schema({
   }
 });
 
+export type ScheduleType = {
+  id: string;
+  weekDay: string;
+  hourOfTheDay: string;
+  usersList: [];
+  numberOfSpots: number;
+};
+
 export const Schedule = mongoose.model("Schedule", ScheduleSchema);
