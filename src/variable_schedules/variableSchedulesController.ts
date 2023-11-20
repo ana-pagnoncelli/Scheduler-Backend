@@ -1,6 +1,10 @@
 /** source/controllers/posts.ts */
 import { Request, Response } from "express";
-import { VariableSchedule, VariableScheduleType } from "./variableSchedule";
+import {
+  SchedulesReturn,
+  VariableSchedule,
+  VariableScheduleType
+} from "./variableSchedule";
 import { User } from "../users";
 import { Schedule, ScheduleType } from "../fixed_schedules";
 import { CanceledSchedule, CanceledSchedulesType } from "../canceled_schedules";
@@ -128,19 +132,6 @@ export const removeUserFromVariableSchedule = async (
   }
 };
 
-type Hour = {
-  hour: string;
-  numberOfSpots: number;
-  availableSpots: number;
-};
-
-type SchedulesReturn = {
-  day: string;
-  numberOfSpots: number;
-  availableSpots: number;
-  hours: Hour[];
-};
-
 const applyFixedSchedules = (
   fixedSchedules: Array<ScheduleType>,
   day: string
@@ -196,6 +187,71 @@ const applyCanceledSchedules = (
   return newScheduleReturn;
 };
 
+const applyVariableSchedules = (
+  variableSchedules: Array<VariableScheduleType>,
+  scheduleReturn: SchedulesReturn
+): SchedulesReturn => {
+  const newScheduleReturn = scheduleReturn;
+  newScheduleReturn.hours = [];
+  let i = 0;
+
+  scheduleReturn.hours.forEach((hour) => {
+    if (
+      variableSchedules.length > i &&
+      hour.hour === variableSchedules[i].hourOfTheDay
+    ) {
+      newScheduleReturn.availableSpots += variableSchedules[i].usersList.length;
+
+      newScheduleReturn.hours.push({
+        hour: hour.hour,
+        numberOfSpots: scheduleReturn.numberOfSpots,
+        availableSpots:
+          scheduleReturn.availableSpots + variableSchedules[i].usersList.length
+      });
+    } else {
+      i += 1;
+    }
+  });
+
+  return newScheduleReturn;
+};
+
+function compareSchedule(a: ScheduleType, b: ScheduleType) {
+  if (a.hourOfTheDay < b.hourOfTheDay) {
+    return -1;
+  }
+  if (a.hourOfTheDay > b.hourOfTheDay) {
+    return 1;
+  }
+  return 0;
+}
+
+function compareVariableSchedule(
+  a: VariableScheduleType,
+  b: VariableScheduleType
+) {
+  if (a.hourOfTheDay < b.hourOfTheDay) {
+    return -1;
+  }
+  if (a.hourOfTheDay > b.hourOfTheDay) {
+    return 1;
+  }
+  return 0;
+}
+
+function compareCanceledSchedule(
+  a: CanceledSchedulesType,
+  b: CanceledSchedulesType
+) {
+  if (a.hourOfTheDay < b.hourOfTheDay) {
+    return -1;
+  }
+  if (a.hourOfTheDay > b.hourOfTheDay) {
+    return 1;
+  }
+  return 0;
+}
+
 export const getSchedulesForAListOfDays = async (
   // receives a list of objects [{week-day date}]
   request: Request,
@@ -203,47 +259,42 @@ export const getSchedulesForAListOfDays = async (
 ) => {
   try {
     const listOfDays = request.body;
+    let scheduleReturn;
 
     listOfDays.forEach(async (day: { week_day: string; date: string }) => {
       // need to order by time
       const fixedSchedules = (await Schedule.find({
         week_day: day.week_day
       })) as Array<ScheduleType>;
+      fixedSchedules.sort(compareSchedule);
 
       // need to order by time
       const canceledSchedules = (await CanceledSchedule.find({
         day: day.date
       })) as Array<CanceledSchedulesType>;
+      canceledSchedules.sort(compareCanceledSchedule);
 
       // need to order by time
       const variableSchedule = (await VariableSchedule.findOne({
         day: day.date
       })) as Array<VariableScheduleType>;
+      variableSchedule.sort(compareVariableSchedule);
 
-      const schedulesAfterApplyFixed: GetSchedulesReturn = applyFixedSchedules(
+      const schedulesAfterApplyFixed: SchedulesReturn = applyFixedSchedules(
         fixedSchedules,
         day.date
       );
+
+      const schedulesAfterApplyCanceled: SchedulesReturn =
+        applyCanceledSchedules(canceledSchedules, schedulesAfterApplyFixed);
+
+      const schedulesAfterApplyVariable: SchedulesReturn =
+        applyVariableSchedules(variableSchedule, schedulesAfterApplyCanceled);
+
+      scheduleReturn.push(schedulesAfterApplyVariable);
     });
 
-    const { userEmail, scheduleId } = request.params;
-
-    const variableSchedule = new VariableSchedule(
-      await VariableSchedule.findOneAndUpdate(
-        { id: scheduleId },
-        { $pull: { users_list: userEmail } },
-        {
-          new: true
-        }
-      )
-    );
-
-    await User.findOneAndUpdate(
-      { email: userEmail },
-      { $pull: { variable_schedules: { id: { $in: scheduleId } } } }
-    );
-
-    response.status(200).send(variableSchedule);
+    response.status(200).send(scheduleReturn);
   } catch (error) {
     response.status(500).send(error);
   }

@@ -11,6 +11,13 @@ export const variableScheduleData = {
   users_list: []
 };
 
+export const variableScheduleBaseData2 = {
+  id: "2",
+  day: "2023-04-21",
+  hour_of_the_day: "15:00",
+  users_list: userData2.email
+};
+
 export const variableScheduleDataWithOneUser = {
   ...variableScheduleBaseData,
   users_list: [userData2.email]
@@ -35,4 +42,12 @@ export const userDataWithSchedule = {
 export const userData2WithSchedule = {
   ...userData,
   variable_schedules: [variableScheduleBaseData]
+};
+
+export const scheduleData2 = {
+  id: "2",
+  week_day: "TUESDAY",
+  hour_of_the_day: "11:00",
+  number_of_spots: 2,
+  users_list: [userData.email]
 };

@@ -30,3 +30,16 @@ export const VariableSchedule = mongoose.model(
   "VariableSchedule",
   VariableScheduleSchema
 );
+
+export type Hour = {
+  hour: string;
+  numberOfSpots: number;
+  availableSpots: number;
+};
+
+export type SchedulesReturn = {
+  day: string;
+  numberOfSpots: number;
+  availableSpots: number;
+  hours: Hour[];
+};
