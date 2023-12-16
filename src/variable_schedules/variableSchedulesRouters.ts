@@ -6,9 +6,9 @@ import {
   deleteVariableSchedule,
   getVariableSchedule,
   addUserInVariableSchedule,
-  removeUserFromVariableSchedule,
-  getSchedulesForAListOfDays
+  removeUserFromVariableSchedule
 } from "./variableSchedulesController";
+import { getSchedulesForAListOfDays } from "./scheduleForAListOfDays";
 
 const router = Router();
 
@@ -24,6 +24,6 @@ router.put(
   "/removeUser/:userEmail/FromVariableSchedule/:scheduleId",
   removeUserFromVariableSchedule
 );
-router.get("/forAListOfDays", getSchedulesForAListOfDays);
+router.get("/get/forAListOfDays/", getSchedulesForAListOfDays);
 
 export { router as variableScheduleRouter };

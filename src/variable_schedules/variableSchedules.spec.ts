@@ -121,7 +121,7 @@ describe("Variable Schedules", () => {
         .send(variableScheduleBaseData2);
 
       const response = await request(httpServer)
-        .get(`/variableSchedules/forAListOfDays/`)
+        .get("/variableSchedules/get/forAListOfDays")
         .send(listOfDays);
 
       const result: Array<SchedulesReturn> = [
