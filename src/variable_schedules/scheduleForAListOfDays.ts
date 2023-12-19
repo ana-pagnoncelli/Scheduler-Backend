@@ -48,15 +48,16 @@ const applyCanceledSchedules = (
   scheduleReturn.hours.forEach((hour) => {
     if (
       canceledSchedules.length > i &&
-      hour.hour === canceledSchedules[i].hourOfTheDay
+      hour.hour === canceledSchedules[i].hour_of_the_day
     ) {
-      newScheduleReturn.availableSpots += canceledSchedules[i].usersList.length;
+      newScheduleReturn.availableSpots +=
+        canceledSchedules[i].users_list.length;
 
       newScheduleReturn.hours.push({
         hour: hour.hour,
         numberOfSpots: scheduleReturn.numberOfSpots,
         availableSpots:
-          scheduleReturn.availableSpots + canceledSchedules[i].usersList.length
+          scheduleReturn.availableSpots + canceledSchedules[i].users_list.length
       });
     } else {
       i += 1;
@@ -77,15 +78,16 @@ const applyVariableSchedules = (
   scheduleReturn.hours.forEach((hour) => {
     if (
       variableSchedules.length > i &&
-      hour.hour === variableSchedules[i].hourOfTheDay
+      hour.hour === variableSchedules[i].hour_of_the_day
     ) {
-      newScheduleReturn.availableSpots += variableSchedules[i].usersList.length;
+      newScheduleReturn.availableSpots +=
+        variableSchedules[i].users_list.length;
 
       newScheduleReturn.hours.push({
         hour: hour.hour,
         numberOfSpots: scheduleReturn.numberOfSpots,
         availableSpots:
-          scheduleReturn.availableSpots + variableSchedules[i].usersList.length
+          scheduleReturn.availableSpots + variableSchedules[i].users_list.length
       });
     } else {
       i += 1;
@@ -95,7 +97,7 @@ const applyVariableSchedules = (
   return newScheduleReturn;
 };
 
-function compareSchedule(a: ScheduleType, b: ScheduleType) {
+export function compareSchedule(a: ScheduleType, b: ScheduleType) {
   if (a.hour_of_the_day < b.hour_of_the_day) {
     return -1;
   }
@@ -105,27 +107,27 @@ function compareSchedule(a: ScheduleType, b: ScheduleType) {
   return 0;
 }
 
-function compareVariableSchedule(
+export function compareVariableSchedule(
   a: VariableScheduleType,
   b: VariableScheduleType
 ) {
-  if (a.hourOfTheDay < b.hourOfTheDay) {
+  if (a.hour_of_the_day < b.hour_of_the_day) {
     return -1;
   }
-  if (a.hourOfTheDay > b.hourOfTheDay) {
+  if (a.hour_of_the_day > b.hour_of_the_day) {
     return 1;
   }
   return 0;
 }
 
-function compareCanceledSchedule(
+export function compareCanceledSchedule(
   a: CanceledSchedulesType,
   b: CanceledSchedulesType
 ) {
-  if (a.hourOfTheDay < b.hourOfTheDay) {
+  if (a.hour_of_the_day < b.hour_of_the_day) {
     return -1;
   }
-  if (a.hourOfTheDay > b.hourOfTheDay) {
+  if (a.hour_of_the_day > b.hour_of_the_day) {
     return 1;
   }
   return 0;

@@ -22,8 +22,8 @@ const VariableScheduleSchema = new mongoose.Schema({
 export type VariableScheduleType = {
   id: string;
   day: string;
-  hourOfTheDay: string;
-  usersList: [];
+  hour_of_the_day: string;
+  users_list: [];
 };
 
 export const VariableSchedule = mongoose.model(

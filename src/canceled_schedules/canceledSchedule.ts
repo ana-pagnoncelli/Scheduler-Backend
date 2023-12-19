@@ -22,8 +22,8 @@ const CanceledScheduleSchema = new mongoose.Schema({
 export type CanceledSchedulesType = {
   id: string;
   day: string;
-  hourOfTheDay: string;
-  usersList: [];
+  hour_of_the_day: string;
+  users_list: [];
 };
 
 export const CanceledSchedule = mongoose.model(
