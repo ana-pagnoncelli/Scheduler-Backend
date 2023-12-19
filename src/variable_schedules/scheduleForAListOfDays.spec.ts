@@ -18,11 +18,14 @@ import { SchedulesReturn, VariableScheduleType } from "./variableSchedule";
 import { ScheduleType } from "../fixed_schedules";
 import {
   applyFixedSchedules,
+  applyVariableSchedules,
   compareCanceledSchedule,
   compareSchedule,
   compareVariableSchedule
 } from "./scheduleForAListOfDays";
 import { CanceledSchedulesType } from "../canceled_schedules";
+
+const day = "MONDAY";
 
 describe("Variable Schedules", () => {
   describe("test sorts ", () => {
@@ -86,11 +89,41 @@ describe("Variable Schedules", () => {
         scheduleData
       ];
 
-      const day = "MONDAY";
-
       const scheduleReturn = applyFixedSchedules(schedules, day);
 
       const expectedReturn: SchedulesReturn = {
+        day,
+        numberOfSpots: 4,
+        availableSpots: 3,
+        hours: [
+          {
+            hour: "17:00",
+            numberOfSpots: 1,
+            availableSpots: 0
+          },
+          {
+            hour: "17:30",
+            numberOfSpots: 1,
+            availableSpots: 1
+          },
+          {
+            hour: "18:00",
+            numberOfSpots: 2,
+            availableSpots: 1
+          }
+        ]
+      };
+      expect(scheduleReturn).toStrictEqual(expectedReturn);
+    });
+
+    it("should apply the variable schedules", () => {
+      const schedules: Array<VariableScheduleType> = [
+        variableScheduleMonday17,
+        variableScheduleMonday1730,
+        variableScheduleMonday18
+      ];
+
+      const scheduleReturn: SchedulesReturn = {
         day,
         numberOfSpots: 4,
         availableSpots: 3,
@@ -112,59 +145,36 @@ describe("Variable Schedules", () => {
           }
         ]
       };
-      expect(scheduleReturn).toStrictEqual(expectedReturn);
+
+      const scheduleReturnResult = applyVariableSchedules(
+        schedules,
+        scheduleReturn
+      );
+
+      const expectedReturn: SchedulesReturn = {
+        day,
+        numberOfSpots: 4,
+        availableSpots: 2,
+        hours: [
+          {
+            hour: "17:00",
+            numberOfSpots: 1,
+            availableSpots: 0
+          },
+          {
+            hour: "17:30",
+            numberOfSpots: 1,
+            availableSpots: 1
+          },
+          {
+            hour: "18:00",
+            numberOfSpots: 2,
+            availableSpots: 1
+          }
+        ]
+      };
+      expect(scheduleReturnResult).toStrictEqual(expectedReturn);
     });
-
-    // it("should apply the variable schedules", () => {
-    //   const scheduleMonday17: VariableScheduleType = {
-    //     id: "2",
-    //     day: "MONDAY",
-    //     hour_of_the_day: "17:00",
-    //     users_list: ["ana"]
-    //   };
-
-    //   const scheduleMonday1730: ScheduleType = {
-    //     id: "3",
-    //     week_day: "MONDAY",
-    //     hour_of_the_day: "17:30",
-    //     users_list: [],
-    //     number_of_spots: 1
-    //   };
-
-    //   const schedules: Array<ScheduleType> = [
-    //     scheduleMonday17,
-    //     scheduleMonday1730,
-    //     scheduleData
-    //   ];
-
-    //   const day = "MONDAY";
-
-    //   const scheduleReturn = applyFixedSchedules(schedules, day);
-
-    //   const expectedReturn: SchedulesReturn = {
-    //     day,
-    //     numberOfSpots: 4,
-    //     availableSpots: 3,
-    //     hours: [
-    //       {
-    //         hour: "17:00",
-    //         numberOfSpots: 1,
-    //         availableSpots: 0
-    //       },
-    //       {
-    //         hour: "17:30",
-    //         numberOfSpots: 1,
-    //         availableSpots: 1
-    //       },
-    //       {
-    //         hour: "18:00",
-    //         numberOfSpots: 2,
-    //         availableSpots: 2
-    //       }
-    //     ]
-    //   };
-    //   expect(scheduleReturn).toStrictEqual(expectedReturn);
-    // });
   });
 
   describe("GET variableSchedules/forAListOfDays ", () => {

@@ -75,7 +75,7 @@ export const variableScheduleMonday18: VariableScheduleType = {
   id: "1",
   day: "2023-02-03",
   hour_of_the_day: "18:00",
-  users_list: []
+  users_list: ["ana"]
 };
 
 export const variableScheduleMonday17: VariableScheduleType = {

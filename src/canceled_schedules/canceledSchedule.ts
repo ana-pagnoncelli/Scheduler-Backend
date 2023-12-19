@@ -23,7 +23,7 @@ export type CanceledSchedulesType = {
   id: string;
   day: string;
   hour_of_the_day: string;
-  users_list: [];
+  users_list: Array<string>;
 };
 
 export const CanceledSchedule = mongoose.model(

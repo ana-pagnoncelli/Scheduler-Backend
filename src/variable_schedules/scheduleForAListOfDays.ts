@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 
@@ -70,12 +71,10 @@ const applyCanceledSchedules = (
   return newScheduleReturn;
 };
 
-const applyVariableSchedules = (
+export const applyVariableSchedules = (
   variableSchedules: Array<VariableScheduleType>,
   scheduleReturn: SchedulesReturn
 ): SchedulesReturn => {
-  const newScheduleReturn = scheduleReturn;
-  newScheduleReturn.hours = [];
   let i = 0;
 
   scheduleReturn.hours.forEach((hour) => {
@@ -83,21 +82,15 @@ const applyVariableSchedules = (
       variableSchedules.length > i &&
       hour.hour === variableSchedules[i].hour_of_the_day
     ) {
-      newScheduleReturn.availableSpots +=
-        variableSchedules[i].users_list.length;
+      const numberOfUsers = variableSchedules[i].users_list.length;
+      scheduleReturn.availableSpots -= numberOfUsers;
 
-      newScheduleReturn.hours.push({
-        hour: hour.hour,
-        numberOfSpots: scheduleReturn.numberOfSpots,
-        availableSpots:
-          scheduleReturn.availableSpots + variableSchedules[i].users_list.length
-      });
-    } else {
-      i += 1;
+      hour.availableSpots -= numberOfUsers;
     }
+    i += 1;
   });
 
-  return newScheduleReturn;
+  return scheduleReturn;
 };
 
 export function compareSchedule(a: ScheduleType, b: ScheduleType) {
