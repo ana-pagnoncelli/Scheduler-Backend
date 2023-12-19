@@ -1,4 +1,5 @@
 import { userData, userData2 } from "../users/fixtures";
+import { ScheduleType } from "./schedule";
 
 const scheduleBaseData = {
   id: "1",
@@ -7,7 +8,7 @@ const scheduleBaseData = {
   number_of_spots: 2
 };
 
-export const scheduleData = {
+export const scheduleData: ScheduleType = {
   ...scheduleBaseData,
   users_list: []
 };

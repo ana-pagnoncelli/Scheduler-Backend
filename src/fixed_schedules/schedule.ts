@@ -36,7 +36,7 @@ export type ScheduleType = {
   id: string;
   week_day: string;
   hour_of_the_day: string;
-  users_list: [];
+  users_list: Array<string>;
   number_of_spots: number;
 };
 

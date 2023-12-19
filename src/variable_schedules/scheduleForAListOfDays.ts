@@ -11,7 +11,7 @@ import {
 import { Schedule, ScheduleType } from "../fixed_schedules";
 import { CanceledSchedule, CanceledSchedulesType } from "../canceled_schedules";
 
-const applyFixedSchedules = (
+export const applyFixedSchedules = (
   fixedSchedules: Array<ScheduleType>,
   day: string
 ): SchedulesReturn => {
@@ -23,14 +23,17 @@ const applyFixedSchedules = (
   };
 
   fixedSchedules.forEach((fixedSchedule) => {
+    const numberOfUsers = fixedSchedule.users_list.length;
+    const availableSpots = fixedSchedule.number_of_spots - numberOfUsers;
+
     scheduleReturn.numberOfSpots += fixedSchedule.number_of_spots;
     scheduleReturn.availableSpots +=
-      fixedSchedule.number_of_spots - fixedSchedule.users_list.length;
+      fixedSchedule.number_of_spots - numberOfUsers;
 
     scheduleReturn.hours.push({
       hour: fixedSchedule.hour_of_the_day,
       numberOfSpots: fixedSchedule.number_of_spots,
-      availableSpots: fixedSchedule.number_of_spots
+      availableSpots
     });
   });
 

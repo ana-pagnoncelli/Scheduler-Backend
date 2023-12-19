@@ -9,6 +9,7 @@ import { scheduleData } from "../fixed_schedules/fixtures";
 import { SchedulesReturn, VariableScheduleType } from "./variableSchedule";
 import { ScheduleType } from "../fixed_schedules";
 import {
+  applyFixedSchedules,
   compareCanceledSchedule,
   compareSchedule,
   compareVariableSchedule
@@ -18,14 +19,6 @@ import { CanceledSchedulesType } from "../canceled_schedules";
 describe("Variable Schedules", () => {
   describe("test sorts ", () => {
     it("should sort the schedules by hour", () => {
-      const scheduleMonday18: ScheduleType = {
-        id: "1",
-        week_day: "MONDAY",
-        hour_of_the_day: "18:00",
-        users_list: [],
-        number_of_spots: 1
-      };
-
       const scheduleMonday17: ScheduleType = {
         id: "2",
         week_day: "MONDAY",
@@ -43,7 +36,7 @@ describe("Variable Schedules", () => {
       };
 
       const scheduleList: Array<ScheduleType> = [
-        scheduleMonday18,
+        scheduleData,
         scheduleMonday17,
         scheduleMonday1730
       ];
@@ -51,7 +44,7 @@ describe("Variable Schedules", () => {
       const expectedSchedule: Array<ScheduleType> = [
         scheduleMonday17,
         scheduleMonday1730,
-        scheduleMonday18
+        scheduleData
       ];
       const sortedSchedule = scheduleList.sort(compareSchedule);
 
@@ -132,6 +125,60 @@ describe("Variable Schedules", () => {
       const sortedSchedule = canceledScheduleList.sort(compareCanceledSchedule);
 
       expect(sortedSchedule).toStrictEqual(expectedCanceledSchedule);
+    });
+  });
+
+  describe("test apply schedules to the schedule return", () => {
+    it("should apply the fixed schedules", () => {
+      const scheduleMonday17: ScheduleType = {
+        id: "2",
+        week_day: "MONDAY",
+        hour_of_the_day: "17:00",
+        users_list: ["ana"],
+        number_of_spots: 1
+      };
+
+      const scheduleMonday1730: ScheduleType = {
+        id: "3",
+        week_day: "MONDAY",
+        hour_of_the_day: "17:30",
+        users_list: [],
+        number_of_spots: 1
+      };
+
+      const schedules: Array<ScheduleType> = [
+        scheduleMonday17,
+        scheduleMonday1730,
+        scheduleData
+      ];
+
+      const day = "MONDAY";
+
+      const scheduleReturn = applyFixedSchedules(schedules, day);
+
+      const expectedReturn: SchedulesReturn = {
+        day,
+        numberOfSpots: 4,
+        availableSpots: 3,
+        hours: [
+          {
+            hour: "17:00",
+            numberOfSpots: 1,
+            availableSpots: 0
+          },
+          {
+            hour: "17:30",
+            numberOfSpots: 1,
+            availableSpots: 1
+          },
+          {
+            hour: "18:00",
+            numberOfSpots: 2,
+            availableSpots: 2
+          }
+        ]
+      };
+      expect(scheduleReturn).toStrictEqual(expectedReturn);
     });
   });
 
