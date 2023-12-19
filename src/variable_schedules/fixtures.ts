@@ -1,4 +1,7 @@
+import { CanceledSchedulesType } from "../canceled_schedules";
+import { ScheduleType } from "../fixed_schedules";
 import { userData, userData2 } from "../users/fixtures";
+import { VariableScheduleType } from "./variableSchedule";
 
 const variableScheduleBaseData = {
   id: "1",
@@ -50,4 +53,62 @@ export const scheduleData2 = {
   hour_of_the_day: "11:00",
   number_of_spots: 2,
   users_list: [userData.email]
+};
+
+export const fixedScheduleMonday17: ScheduleType = {
+  id: "2",
+  week_day: "MONDAY",
+  hour_of_the_day: "17:00",
+  users_list: ["ana"],
+  number_of_spots: 1
+};
+
+export const fixedScheduleMonday1730: ScheduleType = {
+  id: "3",
+  week_day: "MONDAY",
+  hour_of_the_day: "17:30",
+  users_list: [],
+  number_of_spots: 1
+};
+
+export const variableScheduleMonday18: VariableScheduleType = {
+  id: "1",
+  day: "2023-02-03",
+  hour_of_the_day: "18:00",
+  users_list: []
+};
+
+export const variableScheduleMonday17: VariableScheduleType = {
+  id: "2",
+  day: "2023-02-03",
+  hour_of_the_day: "17:00",
+  users_list: []
+};
+
+export const variableScheduleMonday1730: VariableScheduleType = {
+  id: "3",
+  day: "2023-02-03",
+  hour_of_the_day: "17:30",
+  users_list: []
+};
+
+export const canceledScheduleMonday18: CanceledSchedulesType = {
+  id: "1",
+  day: "2023-02-03",
+  hour_of_the_day: "18:00",
+  users_list: []
+};
+
+export const canceledScheduleMonday17: CanceledSchedulesType = {
+  id: "2",
+  day: "2023-02-03",
+  hour_of_the_day: "17:00",
+  users_list: []
+};
+
+export const canceledScheduleMonday1730: CanceledSchedulesType = {
+  id: "3",
+  day: "2023-02-03",
+  hour_of_the_day: "17:30",
+  users_list: []
 };

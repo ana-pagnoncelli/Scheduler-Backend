@@ -3,7 +3,15 @@ import { httpServer } from "../setupTests";
 import {
   variableScheduleData,
   scheduleData2,
-  variableScheduleBaseData2
+  variableScheduleBaseData2,
+  fixedScheduleMonday17,
+  fixedScheduleMonday1730,
+  variableScheduleMonday18,
+  variableScheduleMonday1730,
+  variableScheduleMonday17,
+  canceledScheduleMonday18,
+  canceledScheduleMonday17,
+  canceledScheduleMonday1730
 } from "./fixtures";
 import { scheduleData } from "../fixed_schedules/fixtures";
 import { SchedulesReturn, VariableScheduleType } from "./variableSchedule";
@@ -19,31 +27,15 @@ import { CanceledSchedulesType } from "../canceled_schedules";
 describe("Variable Schedules", () => {
   describe("test sorts ", () => {
     it("should sort the schedules by hour", () => {
-      const scheduleMonday17: ScheduleType = {
-        id: "2",
-        week_day: "MONDAY",
-        hour_of_the_day: "17:00",
-        users_list: [],
-        number_of_spots: 1
-      };
-
-      const scheduleMonday1730: ScheduleType = {
-        id: "3",
-        week_day: "MONDAY",
-        hour_of_the_day: "17:30",
-        users_list: [],
-        number_of_spots: 1
-      };
-
       const scheduleList: Array<ScheduleType> = [
         scheduleData,
-        scheduleMonday17,
-        scheduleMonday1730
+        fixedScheduleMonday17,
+        fixedScheduleMonday1730
       ];
 
       const expectedSchedule: Array<ScheduleType> = [
-        scheduleMonday17,
-        scheduleMonday1730,
+        fixedScheduleMonday17,
+        fixedScheduleMonday1730,
         scheduleData
       ];
       const sortedSchedule = scheduleList.sort(compareSchedule);
@@ -52,37 +44,16 @@ describe("Variable Schedules", () => {
     });
 
     it("should sort the variable schedule by hour", () => {
-      const scheduleMonday18: VariableScheduleType = {
-        id: "1",
-        day: "2023-02-03",
-        hour_of_the_day: "18:00",
-        users_list: []
-      };
-
-      const scheduleMonday17: VariableScheduleType = {
-        id: "2",
-        day: "2023-02-03",
-        hour_of_the_day: "17:00",
-        users_list: []
-      };
-
-      const scheduleMonday1730: VariableScheduleType = {
-        id: "3",
-        day: "2023-02-03",
-        hour_of_the_day: "17:30",
-        users_list: []
-      };
-
       const variableScheduleList: Array<VariableScheduleType> = [
-        scheduleMonday18,
-        scheduleMonday17,
-        scheduleMonday1730
+        variableScheduleMonday18,
+        variableScheduleMonday1730,
+        variableScheduleMonday17
       ];
 
       const expectedVariableSchedule: Array<VariableScheduleType> = [
-        scheduleMonday17,
-        scheduleMonday1730,
-        scheduleMonday18
+        variableScheduleMonday17,
+        variableScheduleMonday1730,
+        variableScheduleMonday18
       ];
       const sortedSchedule = variableScheduleList.sort(compareVariableSchedule);
 
@@ -90,37 +61,16 @@ describe("Variable Schedules", () => {
     });
 
     it("should sort the canceled schedule by hour", () => {
-      const scheduleMonday18: CanceledSchedulesType = {
-        id: "1",
-        day: "2023-02-03",
-        hour_of_the_day: "18:00",
-        users_list: []
-      };
-
-      const scheduleMonday17: CanceledSchedulesType = {
-        id: "2",
-        day: "2023-02-03",
-        hour_of_the_day: "17:00",
-        users_list: []
-      };
-
-      const scheduleMonday1730: CanceledSchedulesType = {
-        id: "3",
-        day: "2023-02-03",
-        hour_of_the_day: "17:30",
-        users_list: []
-      };
-
       const canceledScheduleList: Array<CanceledSchedulesType> = [
-        scheduleMonday18,
-        scheduleMonday17,
-        scheduleMonday1730
+        canceledScheduleMonday18,
+        canceledScheduleMonday17,
+        canceledScheduleMonday1730
       ];
 
       const expectedCanceledSchedule: Array<CanceledSchedulesType> = [
-        scheduleMonday17,
-        scheduleMonday1730,
-        scheduleMonday18
+        canceledScheduleMonday17,
+        canceledScheduleMonday1730,
+        canceledScheduleMonday18
       ];
       const sortedSchedule = canceledScheduleList.sort(compareCanceledSchedule);
 
@@ -130,25 +80,9 @@ describe("Variable Schedules", () => {
 
   describe("test apply schedules to the schedule return", () => {
     it("should apply the fixed schedules", () => {
-      const scheduleMonday17: ScheduleType = {
-        id: "2",
-        week_day: "MONDAY",
-        hour_of_the_day: "17:00",
-        users_list: ["ana"],
-        number_of_spots: 1
-      };
-
-      const scheduleMonday1730: ScheduleType = {
-        id: "3",
-        week_day: "MONDAY",
-        hour_of_the_day: "17:30",
-        users_list: [],
-        number_of_spots: 1
-      };
-
       const schedules: Array<ScheduleType> = [
-        scheduleMonday17,
-        scheduleMonday1730,
+        fixedScheduleMonday17,
+        fixedScheduleMonday1730,
         scheduleData
       ];
 
@@ -180,6 +114,57 @@ describe("Variable Schedules", () => {
       };
       expect(scheduleReturn).toStrictEqual(expectedReturn);
     });
+
+    // it("should apply the variable schedules", () => {
+    //   const scheduleMonday17: VariableScheduleType = {
+    //     id: "2",
+    //     day: "MONDAY",
+    //     hour_of_the_day: "17:00",
+    //     users_list: ["ana"]
+    //   };
+
+    //   const scheduleMonday1730: ScheduleType = {
+    //     id: "3",
+    //     week_day: "MONDAY",
+    //     hour_of_the_day: "17:30",
+    //     users_list: [],
+    //     number_of_spots: 1
+    //   };
+
+    //   const schedules: Array<ScheduleType> = [
+    //     scheduleMonday17,
+    //     scheduleMonday1730,
+    //     scheduleData
+    //   ];
+
+    //   const day = "MONDAY";
+
+    //   const scheduleReturn = applyFixedSchedules(schedules, day);
+
+    //   const expectedReturn: SchedulesReturn = {
+    //     day,
+    //     numberOfSpots: 4,
+    //     availableSpots: 3,
+    //     hours: [
+    //       {
+    //         hour: "17:00",
+    //         numberOfSpots: 1,
+    //         availableSpots: 0
+    //       },
+    //       {
+    //         hour: "17:30",
+    //         numberOfSpots: 1,
+    //         availableSpots: 1
+    //       },
+    //       {
+    //         hour: "18:00",
+    //         numberOfSpots: 2,
+    //         availableSpots: 2
+    //       }
+    //     ]
+    //   };
+    //   expect(scheduleReturn).toStrictEqual(expectedReturn);
+    // });
   });
 
   describe("GET variableSchedules/forAListOfDays ", () => {
