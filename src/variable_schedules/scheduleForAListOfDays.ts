@@ -45,8 +45,6 @@ export const applyCanceledSchedules = (
   canceledSchedules: Array<CanceledSchedulesType>,
   scheduleReturn: SchedulesReturn
 ): SchedulesReturn => {
-  let i = 0;
-
   scheduleReturn.hours.forEach((hour) => {
     canceledSchedules.forEach((canceledSchedule) => {
       if (hour.hour === canceledSchedule.hour_of_the_day) {
@@ -161,13 +159,10 @@ const joinSchedules = (
     schedulesAfterApplyFixed
   );
 
-  console.log("variableSchedule", variableSchedule);
-
   const schedulesAfterApplyVariable: SchedulesReturn = applyVariableSchedules(
     variableSchedule,
     schedulesAfterApplyCanceled
   );
-  console.log("schedulesAfterApplyVariable", schedulesAfterApplyVariable);
 
   return schedulesAfterApplyVariable;
 };

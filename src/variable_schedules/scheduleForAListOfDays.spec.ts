@@ -236,7 +236,7 @@ describe("Variable Schedules", () => {
   });
 
   describe("GET variableSchedules/forAListOfDays ", () => {
-    it("Should get the schedule for a list of days", async () => {
+    it("Should get the schedule for a list of days when there is a variable schedule", async () => {
       const listOfDays = [
         { week_day: "MONDAY", date: "2023-02-03" },
         { week_day: "TUESDAY", date: "2023-02-04" }
@@ -280,32 +280,57 @@ describe("Variable Schedules", () => {
         .get("/variableSchedules/get/forAListOfDays")
         .send(listOfDays);
 
-      // await request(httpServer)
-      //   .post("/variableSchedules")
-      //   .send(variableScheduleBaseData2);
+      expect(response.body).toMatchObject(result);
+      expect(response.statusCode).toBe(200);
+    });
 
-      // const response = await request(httpServer)
-      //   .get("/variableSchedules/get/forAListOfDays")
-      //   .send(listOfDays);
+    it("Should get the schedule for a list of days when there is a variable and a canceled schedule", async () => {
+      const listOfDays = [
+        { week_day: "MONDAY", date: "2023-02-03" },
+        { week_day: "TUESDAY", date: "2023-02-04" }
+      ];
 
-      // const result: Array<SchedulesReturn> = [
-      //   {
-      //     day: "2023-04-20",
-      //     numberOfSpots: 2,
-      //     availableSpots: 2,
-      //     hours: [{ hour: "18:00", numberOfSpots: 2, availableSpots: 2 }]
-      //   },
+      await request(httpServer)
+        .post("/schedules")
+        .send(fixedScheduleMonday1730);
+      await request(httpServer).post("/schedules").send(fixedScheduleMonday18);
+      await request(httpServer).post("/schedules").send(fixedScheduleMonday17);
 
-      //   {
-      //     day: "2023-04-21",
-      //     numberOfSpots: 2,
-      //     availableSpots: 2,
-      //     hours: [
-      //       { hour: "11:00", numberOfSpots: 2, availableSpots: 1 },
-      //       { hour: "15:00", numberOfSpots: 2, availableSpots: 1 }
-      //     ]
-      //   }
-      // ];
+      await request(httpServer)
+        .post("/schedules")
+        .send(fixedScheduleTuesday1730);
+
+      await request(httpServer)
+        .post("/variableSchedules")
+        .send(variableScheduleMonday18);
+
+      await request(httpServer)
+        .post("/canceledSchedules")
+        .send(canceledScheduleMonday17);
+
+      const result: Array<SchedulesReturn> = [
+        {
+          day: "2023-02-03",
+          numberOfSpots: 4,
+          availableSpots: 2,
+          hours: [
+            { hour: "17:00", numberOfSpots: 1, availableSpots: 1 },
+            { hour: "17:30", numberOfSpots: 1, availableSpots: 1 },
+            { hour: "18:00", numberOfSpots: 2, availableSpots: 0 }
+          ]
+        },
+
+        {
+          day: "2023-02-04",
+          numberOfSpots: 1,
+          availableSpots: 1,
+          hours: [{ hour: "17:30", numberOfSpots: 1, availableSpots: 1 }]
+        }
+      ];
+
+      const response = await request(httpServer)
+        .get("/variableSchedules/get/forAListOfDays")
+        .send(listOfDays);
 
       expect(response.body).toMatchObject(result);
       expect(response.statusCode).toBe(200);
