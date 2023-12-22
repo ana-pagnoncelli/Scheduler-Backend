@@ -55,6 +55,14 @@ export const scheduleData2 = {
   users_list: [userData.email]
 };
 
+export const fixedScheduleMonday18 = {
+  id: "1",
+  week_day: "MONDAY",
+  hour_of_the_day: "18:00",
+  number_of_spots: 2,
+  users_list: ["gio"]
+};
+
 export const fixedScheduleMonday17: ScheduleType = {
   id: "2",
   week_day: "MONDAY",
@@ -66,6 +74,14 @@ export const fixedScheduleMonday17: ScheduleType = {
 export const fixedScheduleMonday1730: ScheduleType = {
   id: "3",
   week_day: "MONDAY",
+  hour_of_the_day: "17:30",
+  users_list: [],
+  number_of_spots: 1
+};
+
+export const fixedScheduleTuesday1730: ScheduleType = {
+  id: "4",
+  week_day: "TUESDAY",
   hour_of_the_day: "17:30",
   users_list: [],
   number_of_spots: 1
@@ -103,7 +119,7 @@ export const canceledScheduleMonday17: CanceledSchedulesType = {
   id: "2",
   day: "2023-02-03",
   hour_of_the_day: "17:00",
-  users_list: []
+  users_list: ["ana"]
 };
 
 export const canceledScheduleMonday1730: CanceledSchedulesType = {

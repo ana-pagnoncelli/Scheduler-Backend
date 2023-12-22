@@ -41,53 +41,39 @@ export const applyFixedSchedules = (
   return scheduleReturn;
 };
 
-const applyCanceledSchedules = (
+export const applyCanceledSchedules = (
   canceledSchedules: Array<CanceledSchedulesType>,
   scheduleReturn: SchedulesReturn
 ): SchedulesReturn => {
-  const newScheduleReturn = scheduleReturn;
-  newScheduleReturn.hours = [];
   let i = 0;
 
   scheduleReturn.hours.forEach((hour) => {
-    if (
-      canceledSchedules.length > i &&
-      hour.hour === canceledSchedules[i].hour_of_the_day
-    ) {
-      newScheduleReturn.availableSpots +=
-        canceledSchedules[i].users_list.length;
+    canceledSchedules.forEach((canceledSchedule) => {
+      if (hour.hour === canceledSchedule.hour_of_the_day) {
+        const numberOfUsers = canceledSchedule.users_list.length;
+        scheduleReturn.availableSpots += numberOfUsers;
 
-      newScheduleReturn.hours.push({
-        hour: hour.hour,
-        numberOfSpots: scheduleReturn.numberOfSpots,
-        availableSpots:
-          scheduleReturn.availableSpots + canceledSchedules[i].users_list.length
-      });
-    } else {
-      i += 1;
-    }
+        hour.availableSpots += numberOfUsers;
+      }
+    });
   });
 
-  return newScheduleReturn;
+  return scheduleReturn;
 };
 
 export const applyVariableSchedules = (
   variableSchedules: Array<VariableScheduleType>,
   scheduleReturn: SchedulesReturn
 ): SchedulesReturn => {
-  let i = 0;
-
   scheduleReturn.hours.forEach((hour) => {
-    if (
-      variableSchedules.length > i &&
-      hour.hour === variableSchedules[i].hour_of_the_day
-    ) {
-      const numberOfUsers = variableSchedules[i].users_list.length;
-      scheduleReturn.availableSpots -= numberOfUsers;
+    variableSchedules.forEach((variableSchedule) => {
+      if (hour.hour === variableSchedule.hour_of_the_day) {
+        const numberOfUsers = variableSchedule.users_list.length;
+        scheduleReturn.availableSpots -= numberOfUsers;
 
-      hour.availableSpots -= numberOfUsers;
-    }
-    i += 1;
+        hour.availableSpots -= numberOfUsers;
+      }
+    });
   });
 
   return scheduleReturn;
@@ -170,19 +156,18 @@ const joinSchedules = (
     date
   );
 
-  console.log(schedulesAfterApplyFixed);
-
   const schedulesAfterApplyCanceled: SchedulesReturn = applyCanceledSchedules(
     canceledSchedules,
     schedulesAfterApplyFixed
   );
 
-  console.log(fixedSchedules);
+  console.log("variableSchedule", variableSchedule);
 
   const schedulesAfterApplyVariable: SchedulesReturn = applyVariableSchedules(
     variableSchedule,
     schedulesAfterApplyCanceled
   );
+  console.log("schedulesAfterApplyVariable", schedulesAfterApplyVariable);
 
   return schedulesAfterApplyVariable;
 };
@@ -197,19 +182,11 @@ export const getSchedulesForAListOfDays = async (
     const scheduleReturn = [];
 
     for (const day of listOfDays) {
-      console.log("day", day);
-
       const fixedSchedules = await getFixedSchedules(day.week_day);
-
-      console.log("fixed schedule", fixedSchedules);
 
       const variableSchedule = await getVariableSchedules(day.date);
 
-      console.log("variable schedule", variableSchedule);
-
       const canceledSchedules = await getCanceledSchedules(day.date);
-
-      console.log("canceled schedule", canceledSchedules);
 
       const joinedSchedules = joinSchedules(
         day.date,
@@ -217,8 +194,6 @@ export const getSchedulesForAListOfDays = async (
         canceledSchedules,
         variableSchedule
       );
-
-      console.log(joinedSchedules);
 
       scheduleReturn.push(joinedSchedules);
     }
