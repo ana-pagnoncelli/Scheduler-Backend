@@ -4,8 +4,7 @@ import {
   scheduleData,
   scheduleDataWithOneUser,
   scheduleWithMissingData,
-  updatedScheduleData,
-  userDataWithSchedule
+  updatedScheduleData
 } from "./fixtures";
 import { userData, userData2 } from "../users/fixtures";
 
@@ -25,11 +24,20 @@ describe("Schedules", () => {
     });
   });
 
-  describe("GET /:id ", () => {
+  describe("GET /byId/:id ", () => {
     it("Should return the searched schedule", async () => {
       await request(httpServer).post("/schedules").send(scheduleData);
-      const response = await request(httpServer).get("/schedules/1");
+      const response = await request(httpServer).get("/schedules/byId/1");
       expect(response.body).toMatchObject(scheduleData);
+      expect(response.statusCode).toBe(200);
+    });
+  });
+
+  describe("GET /all ", () => {
+    it("Should return the all the schedules", async () => {
+      await request(httpServer).post("/schedules").send(scheduleData);
+      const response = await request(httpServer).get("/schedules/all");
+      expect(response.body).toMatchObject([scheduleData]);
       expect(response.statusCode).toBe(200);
     });
   });
@@ -73,7 +81,16 @@ describe("Schedules", () => {
         `/users/${userData.email}`
       );
 
-      expect(userResponse.body).toMatchObject(userDataWithSchedule);
+      expect(userResponse.body).toMatchObject({
+        ...userData,
+        fixed_schedules: [
+          {
+            id: "1",
+            week_day: "MONDAY",
+            hour_of_the_day: "18:00"
+          }
+        ]
+      });
     });
   });
 

@@ -1,7 +1,7 @@
 import { userData, userData2 } from "../users/fixtures";
 import { ScheduleType } from "./schedule";
 
-const scheduleBaseData = {
+export const scheduleBaseData = {
   id: "1",
   week_day: "MONDAY",
   hour_of_the_day: "18:00",

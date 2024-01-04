@@ -6,7 +6,8 @@ import {
   deleteSchedule,
   getSchedule,
   addUserInSchedule,
-  removeUserFromSchedule
+  removeUserFromSchedule,
+  getSchedules
 } from "./schedulesController";
 
 const router = Router();
@@ -18,7 +19,8 @@ router.put(
   "/removeUser/:userEmail/FromSchedule/:scheduleId",
   removeUserFromSchedule
 );
-router.get("/:id", getSchedule);
+router.get("/byId/:id", getSchedule);
+router.get("/all", getSchedules);
 router.delete("/:id", deleteSchedule);
 
 export { router as scheduleRouter };

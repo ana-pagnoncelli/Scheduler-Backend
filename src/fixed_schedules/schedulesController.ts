@@ -107,3 +107,12 @@ export const removeUserFromSchedule = async (
     response.status(500).send(error);
   }
 };
+
+export const getSchedules = async (request: Request, response: Response) => {
+  try {
+    const schedules = await Schedule.find({});
+    response.send(schedules);
+  } catch (error) {
+    response.status(500).send(error);
+  }
+};

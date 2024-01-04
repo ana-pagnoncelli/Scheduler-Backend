@@ -18,6 +18,10 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  admin: {
+    type: Boolean,
+    default: false
+  },
   phone: {
     type: Number,
     default: 0
