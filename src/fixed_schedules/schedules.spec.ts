@@ -14,13 +14,20 @@ describe("Schedules", () => {
       const response = await request(httpServer)
         .post("/schedules")
         .send(scheduleData);
-      expect(response.statusCode).toBe(200);
+      expect(response.statusCode).toBe(201);
     });
     it("Should not create a schedule when a field is missing", async () => {
       const response = await request(httpServer)
         .post("/schedules")
         .send(scheduleWithMissingData);
       expect(response.statusCode).toBe(500);
+    });
+    it("Should not create a schedule when the same hour and day are given", async () => {
+      const response = await request(httpServer)
+        .post("/schedules")
+        .send(scheduleData);
+      expect(response.statusCode).toBe(400);
+      expect(response.body.message).toBe("This schedule already exists");
     });
   });
 

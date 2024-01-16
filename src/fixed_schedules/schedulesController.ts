@@ -1,13 +1,29 @@
 /** source/controllers/posts.ts */
 import { Request, Response } from "express";
-import { Schedule } from "./schedule";
+import { Schedule, ScheduleType } from "./schedule";
 import { User } from "../users";
+
+const isNew = async (schedule: ScheduleType) => {
+  const existingSchedule = await Schedule.find({
+    week_day: schedule.week_day,
+    hour_of_the_day: schedule.hour_of_the_day
+  });
+
+  return existingSchedule.length === 0;
+};
 
 export const addSchedule = async (request: Request, response: Response) => {
   try {
     const schedule = new Schedule(request.body);
-    await schedule.save();
-    response.send(schedule);
+
+    if (await isNew(schedule)) {
+      await schedule.save();
+      response.status(201).send(schedule);
+    } else {
+      response.status(400).send({
+        message: "This schedule already exists"
+      });
+    }
   } catch (error) {
     response.status(500).send(error);
   }
