@@ -25,7 +25,9 @@ export const addSchedule = async (request: Request, response: Response) => {
       });
     }
   } catch (error) {
-    response.status(500).send(error);
+    response.status(500).send({
+      message: "It was not possible to create the schedule, try again later"
+    });
   }
 };
 
