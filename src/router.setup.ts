@@ -4,6 +4,7 @@ import { userRouter } from "./users";
 import { variableScheduleRouter } from "./variable_schedules";
 import { scheduleRouter } from "./fixed_schedules";
 import { canceledScheduleRouter } from "./canceled_schedules";
+import { planRouter } from "./plans";
 
 export const router: Express = express();
 
@@ -33,6 +34,7 @@ router.use((req, res, next) => {
 
 /** Routes */
 router.use("/users", userRouter);
+router.use("/plans", planRouter);
 router.use("/schedules", scheduleRouter);
 router.use("/variableSchedules", variableScheduleRouter);
 router.use("/canceledSchedules", canceledScheduleRouter);
