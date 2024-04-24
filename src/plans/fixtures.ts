@@ -6,7 +6,6 @@ export const planData = {
   price: 250,
   description:
     "2 classes per week, totalizing 8 classes in a month. The payment is every month",
-  number_of_classes: 8,
   classes_per_week: 2
 };
 
@@ -16,7 +15,6 @@ export const planData2 = {
   price: 100,
   description:
     "1 class per week, totalizing 12 classes. The payment is every 3 months",
-  number_of_classes: 12,
   classes_per_week: 1
 };
 
@@ -30,6 +28,5 @@ export const planDataWithMissingName = {
   price: 100,
   description:
     "1 class per week, totalizing 12 classes. The payment is every 3 months",
-  number_of_classes: 12,
   classes_per_week: 1
 };

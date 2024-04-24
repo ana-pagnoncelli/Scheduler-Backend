@@ -17,10 +17,6 @@ const PlanSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  number_of_classes: {
-    type: Number,
-    required: true
-  },
   classes_per_week: {
     type: Number,
     required: true
