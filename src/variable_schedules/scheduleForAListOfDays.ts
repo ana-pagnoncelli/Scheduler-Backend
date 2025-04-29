@@ -154,17 +154,17 @@ const joinSchedules = (
     date
   );
 
-  const schedulesAfterApplyCanceled: SchedulesReturn = applyCanceledSchedules(
-    canceledSchedules,
+  const schedulesAfterApplyVariable: SchedulesReturn = applyVariableSchedules(
+    variableSchedule,
     schedulesAfterApplyFixed
   );
 
-  const schedulesAfterApplyVariable: SchedulesReturn = applyVariableSchedules(
-    variableSchedule,
-    schedulesAfterApplyCanceled
+  const schedulesAfterApplyCanceled: SchedulesReturn = applyCanceledSchedules(
+    canceledSchedules,
+    schedulesAfterApplyVariable
   );
 
-  return schedulesAfterApplyVariable;
+  return schedulesAfterApplyCanceled;
 };
 
 export const getSchedulesForAListOfDays = async (

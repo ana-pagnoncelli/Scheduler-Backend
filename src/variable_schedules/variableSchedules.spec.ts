@@ -7,6 +7,7 @@ import {
   updatedVariableScheduleData,
   userDataWithSchedule,
   scheduleData2,
+  scheduleData3,
   variableScheduleBaseData2
 } from "./fixtures";
 import { userData, userData2 } from "../users/fixtures";
@@ -111,6 +112,7 @@ describe("Variable Schedules", () => {
 
       await request(httpServer).post("/schedules").send(scheduleData);
       await request(httpServer).post("/schedules").send(scheduleData2);
+      await request(httpServer).post("/schedules").send(scheduleData3);
 
       await request(httpServer)
         .post("/variableSchedules")
@@ -131,10 +133,9 @@ describe("Variable Schedules", () => {
           availableSpots: 2,
           hours: [{ hour: "18:00", numberOfSpots: 2, availableSpots: 2 }]
         },
-
         {
           day: "2023-04-21",
-          numberOfSpots: 2,
+          numberOfSpots: 4,
           availableSpots: 2,
           hours: [
             { hour: "11:00", numberOfSpots: 2, availableSpots: 1 },

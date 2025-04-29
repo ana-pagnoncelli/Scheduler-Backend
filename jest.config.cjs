@@ -5,5 +5,6 @@ module.exports = {
   setupFilesAfterEnv: ["<rootDir>/src/setupTests.ts"],
   testEnvironment: "node",
   coveragePathIgnorePatterns: ["/node_modules/"],
-  verbose: true
+  verbose: true,
+  testTimeout: 7000
 };

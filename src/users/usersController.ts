@@ -73,3 +73,19 @@ export const login = async (request: Request, response: Response) => {
     response.status(500).send(error);
   }
 };
+
+export const myScheduleInfo = async (
+  // receives an object {week-day date}
+  request: Request,
+  response: Response
+) => {
+  try {
+    const userEmail = request.params.email;
+    const user = new User(await User.findOne({ email: userEmail }));
+
+    const mySchedule = { nextClass: 1, classesToRecover: 2, fixedSchedule: 1 };
+    response.status(200).send(mySchedule);
+  } catch (error) {
+    response.status(500).send(error);
+  }
+};

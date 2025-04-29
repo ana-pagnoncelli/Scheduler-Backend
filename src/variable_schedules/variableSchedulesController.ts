@@ -54,7 +54,6 @@ export const getVariableSchedule = async (
   request: Request,
   response: Response
 ) => {
-  console.log("oi");
   try {
     const scheduleId = request.params.id;
     const variableSchedule = await VariableSchedule.findOne({ id: scheduleId });

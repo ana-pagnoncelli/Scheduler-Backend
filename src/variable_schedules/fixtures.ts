@@ -55,6 +55,14 @@ export const scheduleData2 = {
   users_list: [userData.email]
 };
 
+export const scheduleData3 = {
+  id: "3",
+  week_day: "TUESDAY",
+  hour_of_the_day: "15:00",
+  number_of_spots: 2,
+  users_list: []
+};
+
 export const fixedScheduleMonday18 = {
   id: "1",
   week_day: "MONDAY",
