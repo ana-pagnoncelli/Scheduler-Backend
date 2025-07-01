@@ -24,6 +24,6 @@ router.put(
   "/removeUser/:userEmail/FromVariableSchedule/:scheduleId",
   removeUserFromVariableSchedule
 );
-router.get("/get/forAListOfDays/", getSchedulesForAListOfDays);
+router.post("/get/forAListOfDays/", getSchedulesForAListOfDays);
 
 export { router as variableScheduleRouter };

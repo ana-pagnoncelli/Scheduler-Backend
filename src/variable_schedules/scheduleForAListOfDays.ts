@@ -174,6 +174,7 @@ export const getSchedulesForAListOfDays = async (
 ) => {
   try {
     const listOfDays = request.body;
+    console.log(listOfDays);
     const scheduleReturn = [];
 
     for (const day of listOfDays) {

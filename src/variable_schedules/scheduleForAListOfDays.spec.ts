@@ -235,7 +235,7 @@ describe("Variable Schedules", () => {
     });
   });
 
-  describe("GET variableSchedules/forAListOfDays ", () => {
+  describe("POST variableSchedules/forAListOfDays ", () => {
     it("Should get the schedule for a list of days when there is a variable schedule", async () => {
       const listOfDays = [
         { week_day: "MONDAY", date: "2023-02-03" },
@@ -277,7 +277,7 @@ describe("Variable Schedules", () => {
       ];
 
       const response = await request(httpServer)
-        .get("/variableSchedules/get/forAListOfDays")
+        .post("/variableSchedules/get/forAListOfDays")
         .send(listOfDays);
 
       expect(response.body).toMatchObject(result);
@@ -329,7 +329,7 @@ describe("Variable Schedules", () => {
       ];
 
       const response = await request(httpServer)
-        .get("/variableSchedules/get/forAListOfDays")
+        .post("/variableSchedules/get/forAListOfDays")
         .send(listOfDays);
 
       expect(response.body).toMatchObject(result);

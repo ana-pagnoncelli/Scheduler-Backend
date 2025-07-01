@@ -65,8 +65,6 @@
 
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
-
 Clinics, pilates studios, beauty salons, and other businesses that rely on appointments and class schedules can greatly benefit from a platform like Scheduler. With Scheduler, businesses can manage their schedules more efficiently, freeing up time to focus on other important tasks.
 
 For example, a pilates studio could use Scheduler to manage its class schedules, allow clients to book, change, or cancel appointments online, post notices or announcements, and send automated notifications to clients. Another interesting feature is the product showcase, where you can display classes, clothes, and accessories.
