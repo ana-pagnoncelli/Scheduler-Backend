@@ -81,9 +81,13 @@ export const myScheduleInfo = async (
 ) => {
   try {
     const userEmail = request.params.email;
-    const user = new User(await User.findOne({ email: userEmail }));
+    // const user = new User(await User.findOne({ email: userEmail }));
 
-    const mySchedule = { nextClass: 1, classesToRecover: 2, fixedSchedule: 1 };
+    const mySchedule = {
+      nextClass: "2025-08-25 10:00",
+      numberOfClassesToRecover: 2,
+      fixedSchedulesDays: ["MONDAY", "WEDNESDAY", "FRIDAY"]
+    };
     response.status(200).send(mySchedule);
   } catch (error) {
     response.status(500).send(error);

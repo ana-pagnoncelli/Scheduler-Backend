@@ -6,7 +6,8 @@ import {
   getUser,
   login,
   updateUser,
-  deleteUser
+  deleteUser,
+  myScheduleInfo
 } from "./usersController";
 
 const router = Router();
@@ -17,5 +18,6 @@ router.get("/:email", getUser);
 router.put("/:email", updateUser);
 router.delete("/:email", deleteUser);
 router.post("/login", login);
+router.post("/my-schedule/:email", myScheduleInfo);
 
 export { router as userRouter };
