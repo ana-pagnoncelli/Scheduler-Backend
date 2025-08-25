@@ -29,6 +29,17 @@ export const addScheduleInUsers = async (schedule: ScheduleType) => {
   await Promise.all(updatePromises);
 };
 
+export const removeScheduleFromUsers = async (schedule: ScheduleType) => {
+  const updatePromises = schedule.users_list.map(async (userEmail) => {
+
+    return User.findOneAndUpdate(
+      { email: userEmail },
+      { $pull: { fixed_schedules: { id: schedule.id } } }
+    );
+  });
+
+  await Promise.all(updatePromises);
+};
 
 export const addSchedule = async (request: Request, response: Response) => {
   try {
@@ -69,6 +80,11 @@ export const deleteSchedule = async (request: Request, response: Response) => {
   try {
     const scheduleId = request.params.id;
     const schedule = await Schedule.findOneAndDelete({ id: scheduleId });
+    
+    if (schedule) {
+      removeScheduleFromUsers(schedule);
+    }
+
     response.status(200).send(schedule);
   } catch (error) {
     response.status(500).send(error);
@@ -138,7 +154,7 @@ export const removeUserFromSchedule = async (
 
     await User.findOneAndUpdate(
       { email: userEmail },
-      { $pull: { fixed_schedules: { id: { $in: scheduleId } } } }
+      { $pull: { fixed_schedules: { id: scheduleId } } }
     );
 
     response.status(200).send(schedule);
