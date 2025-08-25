@@ -81,12 +81,17 @@ export const myScheduleInfo = async (
 ) => {
   try {
     const userEmail = request.params.email;
-    // const user = new User(await User.findOne({ email: userEmail }));
+    const user = new User(await User.findOne({ email: userEmail }));
+    let fixedSchedulesDays: Array<string> = [];
+
+    user.fixed_schedules.forEach((schedule) => {
+      fixedSchedulesDays.push(schedule.week_day + " " + schedule.hour_of_the_day);
+    });
 
     const mySchedule = {
       nextClass: "2025-08-25 10:00",
       numberOfClassesToRecover: 2,
-      fixedSchedulesDays: ["MONDAY", "WEDNESDAY", "FRIDAY"]
+      fixedSchedulesDays: fixedSchedulesDays
     };
     response.status(200).send(mySchedule);
   } catch (error) {

@@ -35,6 +35,7 @@ export type Hour = {
   hour: string;
   numberOfSpots: number;
   availableSpots: number;
+  usersList: Array<string>;
 };
 
 export type SchedulesReturn = {

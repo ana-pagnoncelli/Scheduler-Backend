@@ -26,6 +26,7 @@ export const applyFixedSchedules = (
   fixedSchedules.forEach((fixedSchedule) => {
     const numberOfUsers = fixedSchedule.users_list.length;
     const availableSpots = fixedSchedule.number_of_spots - numberOfUsers;
+    const usersList = fixedSchedule.users_list;
 
     scheduleReturn.numberOfSpots += fixedSchedule.number_of_spots;
     scheduleReturn.availableSpots +=
@@ -34,11 +35,23 @@ export const applyFixedSchedules = (
     scheduleReturn.hours.push({
       hour: fixedSchedule.hour_of_the_day,
       numberOfSpots: fixedSchedule.number_of_spots,
-      availableSpots
+      availableSpots,
+      usersList
     });
   });
 
   return scheduleReturn;
+};
+
+export const removeUsersFromSchedule = (
+  usersListByHour: Array<string>,
+  usersList: Array<string>
+) => {
+  usersList.forEach((userEmail) => {
+    usersListByHour.splice(usersListByHour.indexOf(userEmail), 1);
+  });
+
+  return usersListByHour;
 };
 
 export const applyCanceledSchedules = (
@@ -49,6 +62,11 @@ export const applyCanceledSchedules = (
     canceledSchedules.forEach((canceledSchedule) => {
       if (hour.hour === canceledSchedule.hour_of_the_day) {
         const numberOfUsers = canceledSchedule.users_list.length;
+
+        hour.usersList = removeUsersFromSchedule(
+          hour.usersList,
+          canceledSchedule.users_list
+        );
         scheduleReturn.availableSpots += numberOfUsers;
 
         hour.availableSpots += numberOfUsers;
@@ -67,6 +85,7 @@ export const applyVariableSchedules = (
     variableSchedules.forEach((variableSchedule) => {
       if (hour.hour === variableSchedule.hour_of_the_day) {
         const numberOfUsers = variableSchedule.users_list.length;
+        hour.usersList.push(...variableSchedule.users_list);
         scheduleReturn.availableSpots -= numberOfUsers;
 
         hour.availableSpots -= numberOfUsers;

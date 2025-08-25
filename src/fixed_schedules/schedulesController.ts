@@ -1,5 +1,5 @@
 /** source/controllers/posts.ts */
-import { Request, Response } from "express";
+import { request, Request, Response } from "express";
 import { Schedule, ScheduleType } from "./schedule";
 import { User } from "../users";
 
@@ -11,6 +11,24 @@ const isNew = async (schedule: ScheduleType) => {
 
   return existingSchedule.length === 0;
 };
+
+export const addScheduleInUsers = async (schedule: ScheduleType) => {
+  const updatePromises = schedule.users_list.map(async (userEmail) => {
+    const userSchedule = {
+      id: schedule.id,
+      hour_of_the_day: schedule.hour_of_the_day,
+      week_day: schedule.week_day
+    };
+
+    return User.findOneAndUpdate(
+      { email: userEmail },
+      { $push: { fixed_schedules: userSchedule } }
+    );
+  });
+
+  await Promise.all(updatePromises);
+};
+
 
 export const addSchedule = async (request: Request, response: Response) => {
   try {
@@ -24,6 +42,9 @@ export const addSchedule = async (request: Request, response: Response) => {
         message: "This schedule already exists"
       });
     }
+
+    addScheduleInUsers(schedule);
+
   } catch (error) {
     response.status(500).send({
       message: "It was not possible to create the schedule, try again later"
