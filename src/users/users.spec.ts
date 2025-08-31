@@ -88,14 +88,18 @@ describe("Users", () => {
       const response = await request(httpServer).get(
         `/users/my-schedule/${userData.email}`
       );
-      
+
       expect(response.statusCode).toBe(200);
       expect(response.body).toHaveProperty("nextClass");
       expect(response.body).toHaveProperty("classesToRecover");
       expect(response.body).toHaveProperty("fixedSchedule");
       expect(response.body.nextClass).toBe("2025-08-25");
       expect(response.body.classesToRecover).toBe(2);
-      expect(response.body.fixedSchedule).toBe(["MONDAY", "WEDNESDAY", "FRIDAY"]);
+      expect(response.body.fixedSchedule).toBe([
+        "MONDAY",
+        "WEDNESDAY",
+        "FRIDAY"
+      ]);
     });
   });
 });

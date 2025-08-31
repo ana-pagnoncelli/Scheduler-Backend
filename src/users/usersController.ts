@@ -1,7 +1,7 @@
 /** source/controllers/posts.ts */
 import { Request, Response } from "express";
 import { User, UserType } from "./user";
-import { findClosestDate, mergeDateLists, weekdaysToDates } from "../utils/date";
+import { findNearestDate, mergeDateLists, weekdaysToDates } from "../utils/date";
 import { WeekDay } from "../fixed_schedules/schedule";
 
 export const addUser = async (request: Request, response: Response) => {
@@ -76,17 +76,7 @@ export const login = async (request: Request, response: Response) => {
   }
 };
 
-export const nextClass = async (referenceDate: string, user: UserType) => {
-  const weekDays : WeekDay[] = user.fixed_schedules.map((schedule) => schedule.week_day as WeekDay);
 
-  const weekDaysDates = weekdaysToDates(referenceDate, weekDays);
-  const canceledSchedulesDates = user.canceled_schedules.map((schedule) => schedule.day);
-  const variableSchedulesDates = user.variable_schedules.map((schedule) => schedule.day);
-
-  const mergedDates = mergeDateLists(weekDaysDates, variableSchedulesDates, canceledSchedulesDates);
-
-  return findClosestDate(referenceDate, mergedDates);
-};
 
 export const myScheduleInfo = async (
   // receives an object {week-day date}

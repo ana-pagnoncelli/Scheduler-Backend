@@ -33,10 +33,10 @@ export function numberOfDaysBetweenDates(
   return end.diff(start, "days");
 }
 
-export function findClosestDate(
+export function findNearestDate(
   pointOfReference: string,
   listOfDates: string[]
-): { date: string | undefined; diff: number } {
+): string | undefined {
   let nearestDate: string | undefined;
   let minDiff: number = Infinity;
 
@@ -55,7 +55,7 @@ export function findClosestDate(
     }
   });
 
-  return { date: nearestDate, diff: minDiff === Infinity ? 0 : minDiff };
+  return nearestDate;
 }
 
 export function findClosestWeekDay(
@@ -156,10 +156,20 @@ export function weekdaysToDates(
   return dates;
 }
 
-export function removeDatesFromList(dates: string[], datesToRemove: string[]): string[] {
+export function removeDatesFromList(
+  dates: string[],
+  datesToRemove: string[]
+): string[] {
   return dates.filter((date) => !datesToRemove.includes(date));
 }
 
-export function mergeDateLists(dates: string[], variableSchedulesDates: string[], canceledSchedulesDates: string[]): string[] {
-  return removeDatesFromList([...dates, ...variableSchedulesDates], canceledSchedulesDates);
+export function mergeDateLists(
+  dates: string[],
+  variableSchedulesDates: string[],
+  canceledSchedulesDates: string[]
+): string[] {
+  return removeDatesFromList(
+    [...dates, ...variableSchedulesDates],
+    canceledSchedulesDates
+  );
 }

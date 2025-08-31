@@ -1,4 +1,4 @@
-import { getWeekDay, getCurrentDate, dateWithWeekDayForNext7Days, findClosestDate, findClosestWeekDay, weekdaysToDates, removeDatesFromList, mergeDateLists } from './date';
+import { getWeekDay, getCurrentDate, dateWithWeekDayForNext7Days, findNearestDate, findClosestWeekDay, weekdaysToDates, removeDatesFromList, mergeDateLists } from './date';
 import { WeekDay } from '../fixed_schedules/schedule';
 
 describe('Date Utility Functions', () => {
@@ -187,75 +187,68 @@ describe('Date Utility Functions', () => {
     });
   });
 
-  describe('findClosestDate', () => {
+  describe('findNearestDate', () => {
     it('should find the closest future date', () => {
       const referenceDate = '2024-01-15';
       const dates = ['2024-01-10', '2024-01-20', '2024-01-25', '2024-01-30'];
       
-      const result = findClosestDate(referenceDate, dates);
+      const result = findNearestDate(referenceDate, dates);
       
-      expect(result.date).toBe('2024-01-20');
-      expect(result.diff).toBe(5); // 5 days from 2024-01-15 to 2024-01-20
+      expect(result).toBe('2024-01-20');
     });
 
     it('should return undefined when no future dates exist', () => {
       const referenceDate = '2024-01-15';
       const dates = ['2024-01-10', '2024-01-12', '2024-01-14'];
       
-      const result = findClosestDate(referenceDate, dates);
+      const result = findNearestDate(referenceDate, dates);
       
-      expect(result.date).toBeUndefined();
-      expect(result.diff).toBe(0);
+      expect(result).toBeUndefined();
     });
 
     it('should handle empty dates array', () => {
       const referenceDate = '2024-01-15';
       const dates: string[] = [];
       
-      const result = findClosestDate(referenceDate, dates);
+      const result = findNearestDate(referenceDate, dates);
       
-      expect(result.date).toBeUndefined();
-      expect(result.diff).toBe(0);
+      expect(result).toBeUndefined();    
     });
 
     it('should find closest date when reference date is same as one of the dates', () => {
       const referenceDate = '2024-01-15';
       const dates = ['2024-01-15', '2024-01-20', '2024-01-25'];
       
-      const result = findClosestDate(referenceDate, dates);
+      const result = findNearestDate(referenceDate, dates);
       
-      expect(result.date).toBe('2024-01-15');
-      expect(result.diff).toBe(0);
+      expect(result).toBe('2024-01-15');
     });
 
     it('should handle dates in different months', () => {
       const referenceDate = '2024-01-31';
       const dates = ['2024-02-01', '2024-02-15', '2024-03-01'];
       
-      const result = findClosestDate(referenceDate, dates);
+      const result = findNearestDate(referenceDate, dates);
       
-      expect(result.date).toBe('2024-02-01');
-      expect(result.diff).toBe(1);
+      expect(result).toBe('2024-02-01');
     });
 
     it('should handle dates in different years', () => {
       const referenceDate = '2023-12-31';
       const dates = ['2024-01-01', '2024-01-15', '2024-02-01'];
       
-      const result = findClosestDate(referenceDate, dates);
+      const result = findNearestDate(referenceDate, dates);
       
-      expect(result.date).toBe('2024-01-01');
-      expect(result.diff).toBe(1);
+      expect(result).toBe('2024-01-01');
     });
 
     it('should find closest date when multiple dates are equally close', () => {
       const referenceDate = '2024-01-15';
       const dates = ['2024-01-20', '2024-01-20', '2024-01-25'];
       
-      const result = findClosestDate(referenceDate, dates);
+      const result = findNearestDate(referenceDate, dates);
       
-      expect(result.date).toBe('2024-01-20');
-      expect(result.diff).toBe(5);
+      expect(result).toBe('2024-01-20');
     });
   });
 
