@@ -1,4 +1,4 @@
-import { getWeekDay, getCurrentDate, dateWithWeekDayForNext7Days, findClosestDate, findClosestWeekDay, weekdaysToDates } from './date';
+import { getWeekDay, getCurrentDate, dateWithWeekDayForNext7Days, findClosestDate, findClosestWeekDay, weekdaysToDates, removeDatesFromList, mergeDateLists } from './date';
 import { WeekDay } from '../fixed_schedules/schedule';
 
 describe('Date Utility Functions', () => {
@@ -563,5 +563,211 @@ describe('Date Utility Functions', () => {
       
       expect(result).toEqual(['2024-01-27']);
     });
+  });
+
+  describe('removeDatesFromList', () => {
+    it('should remove specified dates from the list', () => {
+      const dates = ['2024-01-15', '2024-01-16', '2024-01-17', '2024-01-18'];
+      const datesToRemove = ['2024-01-16', '2024-01-18'];
+      
+      const result = removeDatesFromList(dates, datesToRemove);
+      
+      expect(result).toEqual(['2024-01-15', '2024-01-17']);
+    });
+
+    it('should return empty array when all dates are removed', () => {
+      const dates = ['2024-01-15', '2024-01-16', '2024-01-17'];
+      const datesToRemove = ['2024-01-15', '2024-01-16', '2024-01-17'];
+      
+      const result = removeDatesFromList(dates, datesToRemove);
+      
+      expect(result).toEqual([]);
+    });
+
+    it('should return original list when no dates are removed', () => {
+      const dates = ['2024-01-15', '2024-01-16', '2024-01-17'];
+      const datesToRemove = ['2024-01-18', '2024-01-19'];
+      
+      const result = removeDatesFromList(dates, datesToRemove);
+      
+      expect(result).toEqual(['2024-01-15', '2024-01-16', '2024-01-17']);
+    });
+
+    it('should handle empty dates array', () => {
+      const dates: string[] = [];
+      const datesToRemove = ['2024-01-15', '2024-01-16'];
+      
+      const result = removeDatesFromList(dates, datesToRemove);
+      
+      expect(result).toEqual([]);
+    });
+
+    it('should handle empty datesToRemove array', () => {
+      const dates = ['2024-01-15', '2024-01-16', '2024-01-17'];
+      const datesToRemove: string[] = [];
+      
+      const result = removeDatesFromList(dates, datesToRemove);
+      
+      expect(result).toEqual(['2024-01-15', '2024-01-16', '2024-01-17']);
+    });
+
+    it('should handle both arrays being empty', () => {
+      const dates: string[] = [];
+      const datesToRemove: string[] = [];
+      
+      const result = removeDatesFromList(dates, datesToRemove);
+      
+      expect(result).toEqual([]);
+    });
+
+    it('should handle duplicate dates in datesToRemove', () => {
+      const dates = ['2024-01-15', '2024-01-16', '2024-01-17'];
+      const datesToRemove = ['2024-01-16', '2024-01-16', '2024-01-18'];
+      
+      const result = removeDatesFromList(dates, datesToRemove);
+      
+      expect(result).toEqual(['2024-01-15', '2024-01-17']);
+    });
+
+    it('should handle dates in different formats', () => {
+      const dates = ['2024-01-15', '2024-01-16', '2024-01-17'];
+      const datesToRemove = ['2024-01-16'];
+      
+      const result = removeDatesFromList(dates, datesToRemove);
+      
+      expect(result).toEqual(['2024-01-15', '2024-01-17']);
+    });
+
+    it('should preserve order of remaining dates', () => {
+      const dates = ['2024-01-15', '2024-01-16', '2024-01-17', '2024-01-18', '2024-01-19'];
+      const datesToRemove = ['2024-01-16', '2024-01-18'];
+      
+      const result = removeDatesFromList(dates, datesToRemove);
+      
+      expect(result).toEqual(['2024-01-15', '2024-01-17', '2024-01-19']);
+    });
+
+    it('should handle case sensitivity correctly', () => {
+      const dates = ['2024-01-15', '2024-01-16', '2024-01-17'];
+      const datesToRemove = ['2024-01-16'];
+      
+      const result = removeDatesFromList(dates, datesToRemove);
+      
+      expect(result).toEqual(['2024-01-15', '2024-01-17']);
+    });
+
+    it('should handle dates with different separators', () => {
+      const dates = ['2024-01-15', '2024/01/16', '2024.01.17'];
+      const datesToRemove = ['2024/01/16', '2024.01.17'];
+      
+      const result = removeDatesFromList(dates, datesToRemove);
+      
+      expect(result).toEqual(['2024-01-15']);
+    });
+
+    it('should handle large arrays efficiently', () => {
+      const dates = Array.from({ length: 1000 }, (_, i) => `2024-01-${String(i + 1).padStart(2, '0')}`);
+      const datesToRemove = ['2024-01-500', '2024-01-750'];
+      
+      const result = removeDatesFromList(dates, datesToRemove);
+      
+      expect(result).toHaveLength(998);
+      expect(result).not.toContain('2024-01-500');
+      expect(result).not.toContain('2024-01-750');
+      expect(result).toContain('2024-01-01');
+      expect(result).toContain('2024-01-1000');
+    });
+  });
+});
+
+describe('mergeDateLists', () => {
+  it('should merge dates and variable schedules dates, then remove canceled dates', () => {
+    const dates = ['2024-01-01', '2024-01-02', '2024-01-03'];
+    const variableSchedulesDates = ['2024-01-04', '2024-01-05'];
+    const canceledSchedulesDates = ['2024-01-02', '2024-01-04'];
+
+    const result = mergeDateLists(dates, variableSchedulesDates, canceledSchedulesDates);
+
+    expect(result).toEqual(['2024-01-01', '2024-01-03', '2024-01-05']);
+  });
+
+  it('should handle empty dates array', () => {
+    const dates: string[] = [];
+    const variableSchedulesDates = ['2024-01-01', '2024-01-02'];
+    const canceledSchedulesDates = ['2024-01-01'];
+
+    const result = mergeDateLists(dates, variableSchedulesDates, canceledSchedulesDates);
+
+    expect(result).toEqual(['2024-01-02']);
+  });
+
+  it('should handle empty variable schedules dates array', () => {
+    const dates = ['2024-01-01', '2024-01-02'];
+    const variableSchedulesDates: string[] = [];
+    const canceledSchedulesDates = ['2024-01-01'];
+
+    const result = mergeDateLists(dates, variableSchedulesDates, canceledSchedulesDates);
+
+    expect(result).toEqual(['2024-01-02']);
+  });
+
+  it('should handle empty canceled schedules dates array', () => {
+    const dates = ['2024-01-01', '2024-01-02'];
+    const variableSchedulesDates = ['2024-01-03', '2024-01-04'];
+    const canceledSchedulesDates: string[] = [];
+
+    const result = mergeDateLists(dates, variableSchedulesDates, canceledSchedulesDates);
+
+    expect(result).toEqual(['2024-01-01', '2024-01-02', '2024-01-03', '2024-01-04']);
+  });
+
+  it('should handle all empty arrays', () => {
+    const dates: string[] = [];
+    const variableSchedulesDates: string[] = [];
+    const canceledSchedulesDates: string[] = [];
+
+    const result = mergeDateLists(dates, variableSchedulesDates, canceledSchedulesDates);
+
+    expect(result).toEqual([]);
+  });
+
+  it('should remove all dates when all are canceled', () => {
+    const dates = ['2024-01-01', '2024-01-02'];
+    const variableSchedulesDates = ['2024-01-03'];
+    const canceledSchedulesDates = ['2024-01-01', '2024-01-02', '2024-01-03'];
+
+    const result = mergeDateLists(dates, variableSchedulesDates, canceledSchedulesDates);
+
+    expect(result).toEqual([]);
+  });
+
+  it('should handle duplicate dates in input arrays', () => {
+    const dates = ['2024-01-01', '2024-01-01', '2024-01-02'];
+    const variableSchedulesDates = ['2024-01-02', '2024-01-03'];
+    const canceledSchedulesDates = ['2024-01-01'];
+
+    const result = mergeDateLists(dates, variableSchedulesDates, canceledSchedulesDates);
+
+    expect(result).toEqual(['2024-01-02', '2024-01-02', '2024-01-03']);
+  });
+
+  it('should preserve order of dates', () => {
+    const dates = ['2024-01-03', '2024-01-01', '2024-01-02'];
+    const variableSchedulesDates = ['2024-01-05', '2024-01-04'];
+    const canceledSchedulesDates: string[] = [];
+
+    const result = mergeDateLists(dates, variableSchedulesDates, canceledSchedulesDates);
+
+    expect(result).toEqual(['2024-01-03', '2024-01-01', '2024-01-02', '2024-01-05', '2024-01-04']);
+  });
+
+  it('should handle dates in different formats (though function expects consistent format)', () => {
+    const dates = ['2024-01-01', '2024-01-02'];
+    const variableSchedulesDates = ['2024-01-03'];
+    const canceledSchedulesDates = ['2024-01-01'];
+
+    const result = mergeDateLists(dates, variableSchedulesDates, canceledSchedulesDates);
+
+    expect(result).toEqual(['2024-01-02', '2024-01-03']);
   });
 });

@@ -155,3 +155,11 @@ export function weekdaysToDates(
 
   return dates;
 }
+
+export function removeDatesFromList(dates: string[], datesToRemove: string[]): string[] {
+  return dates.filter((date) => !datesToRemove.includes(date));
+}
+
+export function mergeDateLists(dates: string[], variableSchedulesDates: string[], canceledSchedulesDates: string[]): string[] {
+  return removeDatesFromList([...dates, ...variableSchedulesDates], canceledSchedulesDates);
+}

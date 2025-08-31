@@ -64,6 +64,24 @@ const UserSchema = new mongoose.Schema({
 
 export const User = mongoose.model("User", UserSchema);
 
+export type UserFixedScheduleType = {
+  id: string;
+  hour_of_the_day: string;
+  week_day: string;
+};
+
+export type UserVariableScheduleType = {
+  id: string;
+  hour_of_the_day: string;
+  day: string;
+};
+
+export type UserCanceledSchedulesType = {
+  id: string;
+  hour_of_the_day: string;
+  day: string;
+};
+
 export type UserType = {
   name: string;
   email: string;
@@ -71,4 +89,7 @@ export type UserType = {
   age: number;
   admin: boolean;
   phone: number;
+  fixed_schedules: Array<UserFixedScheduleType>;
+  variable_schedules: Array<UserVariableScheduleType>;
+  canceled_schedules: Array<UserCanceledSchedulesType>;
 };
