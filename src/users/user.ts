@@ -63,3 +63,12 @@ const UserSchema = new mongoose.Schema({
 });
 
 export const User = mongoose.model("User", UserSchema);
+
+export type UserType = {
+  name: string;
+  email: string;
+  password: string;
+  age: number;
+  admin: boolean;
+  phone: number;
+};

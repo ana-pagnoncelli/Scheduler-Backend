@@ -1,6 +1,6 @@
 /** source/controllers/posts.ts */
 import { Request, Response } from "express";
-import { User } from "./user";
+import { User, UserType } from "./user";
 
 export const addUser = async (request: Request, response: Response) => {
   try {
@@ -72,6 +72,10 @@ export const login = async (request: Request, response: Response) => {
   } catch (error) {
     response.status(500).send(error);
   }
+};
+
+export const nextClass = async (weekDay: string, date: string, user: UserType) => {
+  
 };
 
 export const myScheduleInfo = async (

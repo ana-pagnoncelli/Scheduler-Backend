@@ -32,9 +32,11 @@ const ScheduleSchema = new mongoose.Schema({
   }
 });
 
+export type WeekDay = "MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY";
+
 export type ScheduleType = {
   id: string;
-  week_day: string;
+  week_day: WeekDay;
   hour_of_the_day: string;
   users_list: Array<string>;
   number_of_spots: number;
