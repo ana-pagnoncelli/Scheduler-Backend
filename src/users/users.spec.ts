@@ -5,8 +5,13 @@ import {
   userData,
   userDataWithMissingName,
   wrongEmailLogin,
-  wrongPasswordLogin
+  wrongPasswordLogin,
+  userWithFixedSchedules,
+  userWithVariableSchedules,
+  userWithMixedSchedules,
+  userWithNoSchedules
 } from "./fixtures";
+import { NO_CLASS_SCHEDULED_FOR_USER } from "../utils/constants";
 
 describe("Users", () => {
   describe("POST / ", () => {
@@ -82,24 +87,88 @@ describe("Users", () => {
       expect(response.statusCode).toBe(200);
     });
   });
+});
 
-  describe("POST /my-schedule/:email ", () => {
-    it("Should return the user's schedule information", async () => {
-      const response = await request(httpServer).get(
-        `/users/my-schedule/${userData.email}`
-      );
+describe("POST /my-schedule/:email/:referenceDate", () => {
+  it("Should return user schedule information with fixed schedules", async () => {
+    // Create a user with fixed schedules first
+    await request(httpServer).post("/users").send(userWithFixedSchedules);
 
-      expect(response.statusCode).toBe(200);
-      expect(response.body).toHaveProperty("nextClass");
-      expect(response.body).toHaveProperty("classesToRecover");
-      expect(response.body).toHaveProperty("fixedSchedule");
-      expect(response.body.nextClass).toBe("2025-08-25");
-      expect(response.body.classesToRecover).toBe(2);
-      expect(response.body.fixedSchedule).toBe([
-        "MONDAY",
-        "WEDNESDAY",
-        "FRIDAY"
-      ]);
-    });
+    // Test the myScheduleInfo endpoint
+    const response = await request(httpServer)
+      .post(`/users/my-schedule/${userWithFixedSchedules.email}/2024-01-15`);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("nextClass");
+    expect(response.body).toHaveProperty("numberOfClassesToRecover");
+    expect(response.body).toHaveProperty("fixedSchedulesDays");
+    expect(response.body.nextClass).toBe("2024-01-15");
+    expect(response.body.numberOfClassesToRecover).toBe(2);
+    expect(response.body.fixedSchedulesDays).toEqual([
+      "MONDAY 10:00",
+      "WEDNESDAY 14:00"
+    ]);
+  });
+
+  it("Should return user schedule information with variable schedules", async () => {
+    // Create a user with variable schedules
+    await request(httpServer).post("/users").send(userWithVariableSchedules);
+
+    // Test the myScheduleInfo endpoint
+    const response = await request(httpServer)
+      .post(`/users/my-schedule/${userWithVariableSchedules.email}/2024-01-15`);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("nextClass");
+    expect(response.body).toHaveProperty("numberOfClassesToRecover");
+    expect(response.body).toHaveProperty("fixedSchedulesDays");
+    expect(response.body.nextClass).toBe("2024-01-20");
+    expect(response.body.numberOfClassesToRecover).toBe(2);
+    expect(response.body.fixedSchedulesDays).toEqual([]);
+  });
+
+  it("Should return user schedule information with mixed schedules", async () => {
+    // Create a user with both fixed and variable schedules
+    await request(httpServer).post("/users").send(userWithMixedSchedules);
+
+    // Test the myScheduleInfo endpoint
+    const response = await request(httpServer)
+      .post(`/users/my-schedule/${userWithMixedSchedules.email}/2024-01-15`);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("nextClass");
+    expect(response.body).toHaveProperty("numberOfClassesToRecover");
+    expect(response.body).toHaveProperty("fixedSchedulesDays");
+    expect(response.body.nextClass).toBe("2024-01-19");
+    expect(response.body.numberOfClassesToRecover).toBe(2);
+    expect(response.body.fixedSchedulesDays).toEqual([
+      "FRIDAY 09:00"
+    ]);
+  });
+
+  it("Should return 404 when user is not found", async () => {
+    const response = await request(httpServer)
+      .post(`/users/my-schedule/nonexistent@test.com/2024-01-15`);
+
+    expect(response.statusCode).toBe(404);
+    expect(response.body).toHaveProperty("error");
+    expect(response.body.error).toBe("User not found");
+  });
+
+  it("Should handle user with no schedules", async () => {
+    // Create a user with no schedules
+    await request(httpServer).post("/users").send(userWithNoSchedules);
+
+    // Test the myScheduleInfo endpoint
+    const response = await request(httpServer)
+      .post(`/users/my-schedule/${userWithNoSchedules.email}/2024-01-15`);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("nextClass");
+    expect(response.body).toHaveProperty("numberOfClassesToRecover");
+    expect(response.body).toHaveProperty("fixedSchedulesDays");
+    expect(response.body.nextClass).toBe(NO_CLASS_SCHEDULED_FOR_USER);
+    expect(response.body.numberOfClassesToRecover).toBe(2);
+    expect(response.body.fixedSchedulesDays).toEqual([]);
   });
 });

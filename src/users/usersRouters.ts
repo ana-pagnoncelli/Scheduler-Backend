@@ -18,6 +18,6 @@ router.get("/:email", getUser);
 router.put("/:email", updateUser);
 router.delete("/:email", deleteUser);
 router.post("/login", login);
-router.post("/my-schedule/:email", myScheduleInfo);
+router.post("/my-schedule/:email/:referenceDate", myScheduleInfo);
 
 export { router as userRouter };

@@ -9,11 +9,11 @@ const PORT = 6060;
 beforeAll(async () => {
   try {
     httpServer = http.createServer(router);
-    
+
     // Handle port conflicts gracefully
     const serverPromise = new Promise<void>((resolve, reject) => {
-      httpServer.once('error', (err: any) => {
-        if (err.code === 'EADDRINUSE') {
+      httpServer.once("error", (err: any) => {
+        if (err.code === "EADDRINUSE") {
           console.log(`Port ${PORT} is busy, trying alternative port...`);
           httpServer.listen(0, () => {
             const actualPort = (httpServer.address() as any).port;
@@ -24,17 +24,17 @@ beforeAll(async () => {
           reject(err);
         }
       });
-      
+
       httpServer.listen(PORT, () => {
         console.log(`The server is running on port ${PORT}`);
         resolve();
       });
     });
-    
+
     await serverPromise;
     await mongoose.connect(uriTest);
   } catch (error) {
-    console.error('Failed to start test server:', error);
+    console.error("Failed to start test server:", error);
     throw error;
   }
 });
@@ -49,7 +49,7 @@ afterAll(async () => {
       httpServer.close();
     }
   } catch (error) {
-    console.error('Error during test cleanup:', error);
+    console.error("Error during test cleanup:", error);
   }
 });
 

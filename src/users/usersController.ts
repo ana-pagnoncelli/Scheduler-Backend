@@ -1,8 +1,13 @@
 /** source/controllers/posts.ts */
 import { Request, Response } from "express";
 import { User, UserType } from "./user";
-import { findNearestDate, mergeDateLists, weekdaysToDates } from "../utils/date";
+import {
+  findNearestDate,
+  mergeDateLists,
+  weekdaysToDates
+} from "../utils/date";
 import { WeekDay } from "../fixed_schedules/schedule";
+import { nextClass } from "./usersLogic";
 
 export const addUser = async (request: Request, response: Response) => {
   try {
@@ -76,24 +81,30 @@ export const login = async (request: Request, response: Response) => {
   }
 };
 
-
-
 export const myScheduleInfo = async (
-  // receives an object {week-day date}
   request: Request,
   response: Response
 ) => {
   try {
     const userEmail = request.params.email;
-    const user = new User(await User.findOne({ email: userEmail }));
+    const referenceDate = request.params.referenceDate;
+    const userData = await User.findOne({ email: userEmail });
+    
+    if (!userData) {
+      return response.status(404).send({ error: "User not found" });
+    }
+    
+    const user = new User(userData);
     let fixedSchedulesDays: Array<string> = [];
 
     user.fixed_schedules.forEach((schedule) => {
-      fixedSchedulesDays.push(schedule.week_day + " " + schedule.hour_of_the_day);
+      fixedSchedulesDays.push(
+        schedule.week_day + " " + schedule.hour_of_the_day
+      );
     });
 
     const mySchedule = {
-      nextClass: "2025-08-25 10:00",
+      nextClass: nextClass(referenceDate, user as UserType),
       numberOfClassesToRecover: 2,
       fixedSchedulesDays: fixedSchedulesDays
     };

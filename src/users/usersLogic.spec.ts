@@ -1,6 +1,7 @@
 import { nextClass } from "./usersLogic";
 import { UserType } from "./user";
 import { WeekDay } from "../fixed_schedules/schedule";
+import { NO_CLASS_SCHEDULED_FOR_USER } from "../utils/constants";
 
 describe("nextClass", () => {
   const mockUser: UserType = {
@@ -14,38 +15,38 @@ describe("nextClass", () => {
       {
         id: "schedule1",
         hour_of_the_day: "09:00",
-        week_day: "MONDAY" as WeekDay,
+        week_day: "MONDAY" as WeekDay
       },
       {
         id: "schedule2",
         hour_of_the_day: "14:00",
-        week_day: "WEDNESDAY" as WeekDay,
-      },
+        week_day: "WEDNESDAY" as WeekDay
+      }
     ],
     variable_schedules: [
       {
         id: "var1",
         hour_of_the_day: "10:00",
-        day: "2024-01-15", // Monday
+        day: "2024-01-15" // Monday
       },
       {
         id: "var2",
         hour_of_the_day: "16:00",
-        day: "2024-01-20", // Saturday
-      },
+        day: "2024-01-20" // Saturday
+      }
     ],
     canceled_schedules: [
       {
         id: "cancel1",
         hour_of_the_day: "09:00",
-        day: "2024-01-08", // Tuesday
-      },
-    ],
+        day: "2024-01-08" // Tuesday
+      }
+    ]
   };
 
   it("should return the next class date for a user with fixed schedules", async () => {
     const referenceDate = "2024-01-01"; // Monday
-    
+
     const result = nextClass(referenceDate, mockUser);
 
     expect(result).toBe("2024-01-01");
@@ -53,7 +54,7 @@ describe("nextClass", () => {
 
   it("should handle user with variable and canceled schedules", async () => {
     const referenceDate = "2024-01-01";
-    
+
     const result = nextClass(referenceDate, mockUser);
 
     expect(result).toBe("2024-01-01");
@@ -61,7 +62,7 @@ describe("nextClass", () => {
 
   it("should return a variable date", async () => {
     const referenceDate = "2024-01-14";
-    
+
     const result = nextClass(referenceDate, mockUser);
 
     // Should return a valid date string
@@ -71,10 +72,10 @@ describe("nextClass", () => {
   it("should handle user with no fixed schedules", async () => {
     const userWithNoFixedSchedules: UserType = {
       ...mockUser,
-      fixed_schedules: [],
+      fixed_schedules: []
     };
     const referenceDate = "2024-01-01";
-    
+
     const result = nextClass(referenceDate, userWithNoFixedSchedules);
 
     // Should still work with only variable schedules
@@ -84,10 +85,10 @@ describe("nextClass", () => {
   it("should handle user with no variable schedules", async () => {
     const userWithNoVariableSchedules: UserType = {
       ...mockUser,
-      variable_schedules: [],
+      variable_schedules: []
     };
     const referenceDate = "2024-01-01";
-    
+
     const result = nextClass(referenceDate, userWithNoVariableSchedules);
 
     // Should work with only fixed schedules
@@ -97,10 +98,10 @@ describe("nextClass", () => {
   it("should handle user with no canceled schedules", async () => {
     const userWithNoCanceledSchedules: UserType = {
       ...mockUser,
-      canceled_schedules: [],
+      canceled_schedules: []
     };
     const referenceDate = "2024-01-01";
-    
+
     const result = nextClass(referenceDate, userWithNoCanceledSchedules);
 
     // Should work without canceled schedules
@@ -112,14 +113,14 @@ describe("nextClass", () => {
       ...mockUser,
       fixed_schedules: [],
       variable_schedules: [],
-      canceled_schedules: [],
+      canceled_schedules: []
     };
     const referenceDate = "2024-01-01";
-    
+
     const result = nextClass(referenceDate, userWithNoSchedules);
 
     // Should handle empty schedules gracefully
-    expect(result).toBeUndefined();
+    expect(result).toBe(NO_CLASS_SCHEDULED_FOR_USER);
   });
 
   it("should handle different weekdays correctly", async () => {
@@ -129,17 +130,17 @@ describe("nextClass", () => {
         {
           id: "schedule1",
           hour_of_the_day: "09:00",
-          week_day: "FRIDAY" as WeekDay,
+          week_day: "FRIDAY" as WeekDay
         },
         {
           id: "schedule2",
           hour_of_the_day: "14:00",
-          week_day: "SUNDAY" as WeekDay,
-        },
-      ],
+          week_day: "SUNDAY" as WeekDay
+        }
+      ]
     };
     const referenceDate = "2024-01-01";
-    
+
     const result = nextClass(referenceDate, userWithDifferentWeekdays);
 
     // Should work with different weekdays
@@ -153,14 +154,14 @@ describe("nextClass", () => {
         {
           id: "schedule1",
           hour_of_the_day: "09:00",
-          week_day: "TUESDAY" as WeekDay,
-        },
+          week_day: "TUESDAY" as WeekDay
+        }
       ],
       variable_schedules: [],
-      canceled_schedules: [],
+      canceled_schedules: []
     };
     const referenceDate = "2024-01-01";
-    
+
     const result = nextClass(referenceDate, userWithSingleSchedule);
 
     // Should work with single schedule
