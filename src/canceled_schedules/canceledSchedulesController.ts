@@ -3,26 +3,6 @@ import { Request, Response } from "express";
 import { CanceledSchedule } from "./canceledSchedule";
 import { User } from "../users";
 
-export const updateCanceledSchedule = async (
-  request: Request,
-  response: Response
-) => {
-  try {
-    const scheduleId = request.params.id;
-    const data = { $set: request.body };
-    const canceledSchedule = await CanceledSchedule.findOneAndUpdate(
-      { id: scheduleId },
-      data,
-      {
-        new: true
-      }
-    );
-    response.status(200).send(canceledSchedule);
-  } catch (error) {
-    response.status(500).send(error);
-  }
-};
-
 export const deleteCanceledSchedule = async (
   request: Request,
   response: Response
@@ -79,11 +59,10 @@ export const removeUserFromCanceledSchedule = async (
   }
 };
 
-export const addUserInCanceledSchedule = () => {
-
+export const updateCanceledSchedule = () => {
 };
 
-export const addCanceledSchedule = async (
+export const addOrUpdateCanceledSchedule = async (
   request: Request,
   response: Response
 ) => {
@@ -107,12 +86,14 @@ export const addCanceledSchedule = async (
       // Only add user if they're not already in the list
       if (!canceledSchedule.users_list.includes(userEmail)) {
         await canceledSchedule.updateOne({ $push: { users_list: userEmail } });
+        const updatedSchedule = await CanceledSchedule.findOne({
+          hour_of_the_day: scheduleHour,
+          day: scheduleDay
+        });
+        return response.send(updatedSchedule);
+      } else {
+        return response.send(canceledSchedule);
       }
-      const updatedSchedule = await CanceledSchedule.findOne({
-        hour_of_the_day: scheduleHour,
-        day: scheduleDay
-      });
-      response.send(updatedSchedule);
     } else {
       const newCanceledSchedule = new CanceledSchedule({
         id: `${scheduleDay}_${scheduleHour}`,

@@ -31,25 +31,6 @@ describe("Canceled Schedules", () => {
     });
   });
 
-  describe("PUT /:id ", () => {
-    it("Should return the canceled schedule updated", async () => {
-      // Create users first
-      await request(httpServer).post("/users").send(userData);
-      await request(httpServer).post("/users").send(userData2);
-      
-      // Create a canceled schedule
-      await request(httpServer)
-        .post("/canceledSchedules")
-        .send(addCanceledScheduleData);
-        
-      const response = await request(httpServer)
-        .put("/canceledSchedules/2023-04-21_19:00")
-        .send(updatedCanceledScheduleData);
-      expect(response.body).toMatchObject(updatedCanceledScheduleData);
-      expect(response.statusCode).toBe(200);
-    });
-  });
-
   describe("DELETE /:id ", () => {
     it("Should delete the canceled schedule", async () => {
       // Create a user first
