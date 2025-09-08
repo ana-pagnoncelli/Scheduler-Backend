@@ -5,7 +5,11 @@ import {
   canceledScheduleDataWithOneUser,
   canceledScheduleWithMissingData,
   updatedCanceledScheduleData,
-  userDataWithSchedule
+  userDataWithSchedule,
+  addCanceledScheduleData,
+  addCanceledScheduleData2,
+  newCanceledScheduleExpected,
+  existingCanceledScheduleExpected
 } from "./fixtures";
 import { userData, userData2 } from "../users/fixtures";
 
@@ -95,6 +99,47 @@ describe("Canceled Schedules", () => {
       );
 
       expect(userResponse.body).toMatchObject(userData);
+    });
+  });
+
+  describe("POST /:userEmail/:day/:hour", () => {
+    it("Should create a new canceled schedule when no schedule exists for the given day and hour", async () => {
+      // Create users first
+      await request(httpServer).post("/users").send(userData);
+      
+      const response = await request(httpServer).post(
+        `/canceledSchedules/${addCanceledScheduleData.userEmail}/${addCanceledScheduleData.day}/${addCanceledScheduleData.hour}`
+      );
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toMatchObject(newCanceledScheduleExpected);
+    });
+
+    it("Should add user to existing canceled schedule when schedule already exists for the given day and hour", async () => {
+      // Create users first
+      await request(httpServer).post("/users").send(userData);
+      await request(httpServer).post("/users").send(userData2);
+      
+      // First, create a canceled schedule
+      await request(httpServer).post(
+        `/canceledSchedules/${addCanceledScheduleData.userEmail}/${addCanceledScheduleData.day}/${addCanceledScheduleData.hour}`
+      );
+
+      // Then add another user to the same schedule
+      const response = await request(httpServer).post(
+        `/canceledSchedules/${addCanceledScheduleData2.userEmail}/${addCanceledScheduleData2.day}/${addCanceledScheduleData2.hour}`
+      );
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toMatchObject(existingCanceledScheduleExpected);
+    });
+
+    it("Should return 500 when user does not exist", async () => {
+      const response = await request(httpServer).post(
+        `/canceledSchedules/nonexistent@test.com/${addCanceledScheduleData.day}/${addCanceledScheduleData.hour}`
+      );
+
+      expect(response.statusCode).toBe(500);
     });
   });
 });

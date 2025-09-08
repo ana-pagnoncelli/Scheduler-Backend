@@ -13,7 +13,6 @@ export const nextClass = (referenceDate: string, user: UserType): string => {
   );
 
   const weekDaysDates = weekdaysToDates(referenceDate, weekDays);
-  console.log("weekDaysDates", weekDaysDates);
   const canceledSchedulesDates = user.canceled_schedules.map(
     (schedule) => schedule.day
   );

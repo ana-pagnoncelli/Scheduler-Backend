@@ -3,19 +3,6 @@ import { Request, Response } from "express";
 import { CanceledSchedule } from "./canceledSchedule";
 import { User } from "../users";
 
-export const addCanceledSchedule = async (
-  request: Request,
-  response: Response
-) => {
-  try {
-    const canceledSchedule = new CanceledSchedule(request.body);
-    await canceledSchedule.save();
-    response.send(canceledSchedule);
-  } catch (error) {
-    response.status(500).send(error);
-  }
-};
-
 export const updateCanceledSchedule = async (
   request: Request,
   response: Response
@@ -121,6 +108,64 @@ export const removeUserFromCanceledSchedule = async (
     );
 
     response.status(200).send(canceledSchedule);
+  } catch (error) {
+    response.status(500).send(error);
+  }
+};
+
+export const createCanceledSchedule = async (
+  request: Request,
+  response: Response
+) => {
+  try {
+    const canceledSchedule = new CanceledSchedule(request.body);
+    await canceledSchedule.save();
+    response.status(200).send(canceledSchedule);
+  } catch (error) {
+    response.status(500).send(error);
+  }
+};
+
+export const addCanceledSchedule = async (
+  request: Request,
+  response: Response
+) => {
+  try {
+    const scheduleHour = request.params.hour;
+    const scheduleDay = request.params.day;
+    const userEmail = request.params.userEmail;
+
+    // Check if user exists
+    const user = await User.findOne({ email: userEmail });
+    if (!user) {
+      return response.status(500).send({ error: "User not found" });
+    }
+
+    const canceledSchedule = await CanceledSchedule.findOne({
+      hour_of_the_day: scheduleHour,
+      day: scheduleDay
+    });
+
+    if (canceledSchedule) {
+      // Only add user if they're not already in the list
+      if (!canceledSchedule.users_list.includes(userEmail)) {
+        await canceledSchedule.updateOne({ $push: { users_list: userEmail } });
+      }
+      const updatedSchedule = await CanceledSchedule.findOne({
+        hour_of_the_day: scheduleHour,
+        day: scheduleDay
+      });
+      response.send(updatedSchedule);
+    } else {
+      const newCanceledSchedule = new CanceledSchedule({
+        id: `${scheduleDay}_${scheduleHour}`,
+        hour_of_the_day: scheduleHour,
+        day: scheduleDay,
+        users_list: [userEmail]
+      });
+      await newCanceledSchedule.save();
+      response.send(newCanceledSchedule);
+    }
   } catch (error) {
     response.status(500).send(error);
   }

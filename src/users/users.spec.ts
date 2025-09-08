@@ -89,14 +89,14 @@ describe("Users", () => {
   });
 });
 
-describe("POST /my-schedule/:email/:referenceDate", () => {
+describe("GET /my-schedule/:email/:referenceDate", () => {
   it("Should return user schedule information with fixed schedules", async () => {
     // Create a user with fixed schedules first
     await request(httpServer).post("/users").send(userWithFixedSchedules);
 
     // Test the myScheduleInfo endpoint
     const response = await request(httpServer)
-      .post(`/users/my-schedule/${userWithFixedSchedules.email}/2024-01-15`);
+      .get(`/users/my-schedule/${userWithFixedSchedules.email}/2024-01-15`);
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("nextClass");
@@ -116,7 +116,7 @@ describe("POST /my-schedule/:email/:referenceDate", () => {
 
     // Test the myScheduleInfo endpoint
     const response = await request(httpServer)
-      .post(`/users/my-schedule/${userWithVariableSchedules.email}/2024-01-15`);
+      .get(`/users/my-schedule/${userWithVariableSchedules.email}/2024-01-15`);
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("nextClass");
@@ -133,7 +133,7 @@ describe("POST /my-schedule/:email/:referenceDate", () => {
 
     // Test the myScheduleInfo endpoint
     const response = await request(httpServer)
-      .post(`/users/my-schedule/${userWithMixedSchedules.email}/2024-01-15`);
+      .get(`/users/my-schedule/${userWithMixedSchedules.email}/2024-01-15`);
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("nextClass");
@@ -148,7 +148,7 @@ describe("POST /my-schedule/:email/:referenceDate", () => {
 
   it("Should return 404 when user is not found", async () => {
     const response = await request(httpServer)
-      .post(`/users/my-schedule/nonexistent@test.com/2024-01-15`);
+      .get(`/users/my-schedule/nonexistent@test.com/2024-01-15`);
 
     expect(response.statusCode).toBe(404);
     expect(response.body).toHaveProperty("error");
@@ -161,7 +161,7 @@ describe("POST /my-schedule/:email/:referenceDate", () => {
 
     // Test the myScheduleInfo endpoint
     const response = await request(httpServer)
-      .post(`/users/my-schedule/${userWithNoSchedules.email}/2024-01-15`);
+      .get(`/users/my-schedule/${userWithNoSchedules.email}/2024-01-15`);
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("nextClass");

@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema({
@@ -42,8 +43,8 @@ const UserSchema = new mongoose.Schema({
   fixed_schedules: [
     {
       id: String,
-      hour_of_the_day: String,
-      week_day: String
+      hour_of_the_day: { type: String, required: true },
+      week_day: { type: String, required: true }
     }
   ],
   variable_schedules: [

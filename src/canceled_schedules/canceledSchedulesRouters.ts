@@ -1,6 +1,7 @@
 /** source/routes/posts.ts */
 import { Router } from "express";
 import {
+  createCanceledSchedule,
   addCanceledSchedule,
   updateCanceledSchedule,
   deleteCanceledSchedule,
@@ -11,7 +12,8 @@ import {
 
 const router = Router();
 
-router.post("/", addCanceledSchedule);
+router.post("/", createCanceledSchedule);
+router.post("/:userEmail/:day/:hour", addCanceledSchedule);
 router.put("/:id", updateCanceledSchedule);
 router.get("/:id", getCanceledSchedule);
 router.delete("/:id", deleteCanceledSchedule);
