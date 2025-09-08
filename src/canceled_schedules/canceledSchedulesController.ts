@@ -58,6 +58,12 @@ export const addUserInCanceledSchedule = async (
   try {
     const { userEmail, scheduleId } = request.params;
 
+    // First check if the user is already in the schedule
+    const existingSchedule = await CanceledSchedule.findOne({ id: scheduleId });
+    if (existingSchedule && existingSchedule.users_list.includes(userEmail)) {
+      return response.status(200).send(existingSchedule);
+    }
+
     const canceledSchedule = new CanceledSchedule(
       await CanceledSchedule.findOneAndUpdate(
         { id: scheduleId },
@@ -68,16 +74,29 @@ export const addUserInCanceledSchedule = async (
       )
     );
 
+    // Check if user exists
+    const user = await User.findOne({ email: userEmail });
+    if (!user) {
+      return response.status(500).send({ error: "User not found" });
+    }
+
     const userCanceledSchedule = {
       id: canceledSchedule.id,
       hour_of_the_day: canceledSchedule.hour_of_the_day,
       day: canceledSchedule.day
     };
 
-    await User.findOneAndUpdate(
-      { email: userEmail },
-      { $push: { canceled_schedules: userCanceledSchedule } }
+    // Check if user already has this canceled schedule
+    const userHasSchedule = user.canceled_schedules.some(
+      (schedule: any) => schedule.id === canceledSchedule.id
     );
+
+    if (!userHasSchedule) {
+      await User.findOneAndUpdate(
+        { email: userEmail },
+        { $push: { canceled_schedules: userCanceledSchedule } }
+      );
+    }
 
     response.status(200).send(canceledSchedule);
   } catch (error) {
@@ -113,27 +132,14 @@ export const removeUserFromCanceledSchedule = async (
   }
 };
 
-export const createCanceledSchedule = async (
-  request: Request,
-  response: Response
-) => {
-  try {
-    const canceledSchedule = new CanceledSchedule(request.body);
-    await canceledSchedule.save();
-    response.status(200).send(canceledSchedule);
-  } catch (error) {
-    response.status(500).send(error);
-  }
-};
-
 export const addCanceledSchedule = async (
   request: Request,
   response: Response
 ) => {
   try {
-    const scheduleHour = request.params.hour;
-    const scheduleDay = request.params.day;
-    const userEmail = request.params.userEmail;
+    const scheduleHour = request.body.hour;
+    const scheduleDay = request.body.day;
+    const userEmail = request.body.userEmail;
 
     // Check if user exists
     const user = await User.findOne({ email: userEmail });

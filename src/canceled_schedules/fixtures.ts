@@ -12,7 +12,9 @@ export const canceledScheduleData = {
 };
 
 export const canceledScheduleDataWithOneUser = {
-  ...canceledScheduleBaseData,
+  id: "2023-04-21_19:00",
+  day: "2023-04-21",
+  hour_of_the_day: "19:00",
   users_list: [userData2.email]
 };
 
@@ -23,13 +25,19 @@ export const canceledScheduleWithMissingData = {
 };
 
 export const updatedCanceledScheduleData = {
-  ...canceledScheduleBaseData,
+  id: "2023-04-21_19:00",
+  day: "2023-04-21",
+  hour_of_the_day: "19:00",
   users_list: [userData.email, userData2.email]
 };
 
 export const userDataWithSchedule = {
   ...userData,
-  canceled_schedules: [canceledScheduleBaseData]
+  canceled_schedules: [{
+    id: "2023-04-21_19:00",
+    day: "2023-04-21",
+    hour_of_the_day: "19:00"
+  }]
 };
 
 export const userData2WithSchedule = {
