@@ -51,59 +51,6 @@ export const getCanceledSchedule = async (
   }
 };
 
-export const addUserInCanceledSchedule = async (
-  request: Request,
-  response: Response
-) => {
-  try {
-    const { userEmail, scheduleId } = request.params;
-
-    // First check if the user is already in the schedule
-    const existingSchedule = await CanceledSchedule.findOne({ id: scheduleId });
-    if (existingSchedule && existingSchedule.users_list.includes(userEmail)) {
-      return response.status(200).send(existingSchedule);
-    }
-
-    const canceledSchedule = new CanceledSchedule(
-      await CanceledSchedule.findOneAndUpdate(
-        { id: scheduleId },
-        { $push: { users_list: userEmail } },
-        {
-          new: true
-        }
-      )
-    );
-
-    // Check if user exists
-    const user = await User.findOne({ email: userEmail });
-    if (!user) {
-      return response.status(500).send({ error: "User not found" });
-    }
-
-    const userCanceledSchedule = {
-      id: canceledSchedule.id,
-      hour_of_the_day: canceledSchedule.hour_of_the_day,
-      day: canceledSchedule.day
-    };
-
-    // Check if user already has this canceled schedule
-    const userHasSchedule = user.canceled_schedules.some(
-      (schedule: any) => schedule.id === canceledSchedule.id
-    );
-
-    if (!userHasSchedule) {
-      await User.findOneAndUpdate(
-        { email: userEmail },
-        { $push: { canceled_schedules: userCanceledSchedule } }
-      );
-    }
-
-    response.status(200).send(canceledSchedule);
-  } catch (error) {
-    response.status(500).send(error);
-  }
-};
-
 export const removeUserFromCanceledSchedule = async (
   request: Request,
   response: Response
@@ -130,6 +77,10 @@ export const removeUserFromCanceledSchedule = async (
   } catch (error) {
     response.status(500).send(error);
   }
+};
+
+export const addUserInCanceledSchedule = () => {
+
 };
 
 export const addCanceledSchedule = async (

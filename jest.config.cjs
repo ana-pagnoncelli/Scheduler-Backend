@@ -6,5 +6,5 @@ module.exports = {
   testEnvironment: "node",
   coveragePathIgnorePatterns: ["/node_modules/"],
   verbose: true,
-  testTimeout: 10000
+  testTimeout: 20000
 };

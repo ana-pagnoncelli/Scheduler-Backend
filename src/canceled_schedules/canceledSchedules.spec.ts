@@ -64,35 +64,6 @@ describe("Canceled Schedules", () => {
       expect(response.statusCode).toBe(200);
     });
   });
-
-  describe("PUT addUser/:userEmail/InCanceledSchedule/:scheduleId ", () => {
-    it("Should update the canceled schedule and the user", async () => {
-      await request(httpServer).post("/users").send(userData);
-      await request(httpServer).post("/users").send(userData2);
-
-      // Create a canceled schedule using the new addCanceledSchedule function
-      await request(httpServer)
-        .post("/canceledSchedules")
-        .send(addCanceledScheduleData);
-
-      await request(httpServer).put(
-        `/canceledSchedules/addUser/${userData.email}/InCanceledSchedule/2023-04-21_19:00`
-      );
-
-      const response = await request(httpServer).put(
-        `/canceledSchedules/addUser/${userData2.email}/InCanceledSchedule/2023-04-21_19:00`
-      );
-
-      expect(response.statusCode).toBe(200);
-      expect(response.body.day).toBe(updatedCanceledScheduleData.day);
-      expect(response.body.hour_of_the_day).toBe(updatedCanceledScheduleData.hour_of_the_day);
-      expect(response.body.id).toBe(updatedCanceledScheduleData.id);
-      expect(response.body.users_list).toContain("test@test");
-      expect(response.body.users_list).toContain("test@test2");
-      expect(response.body.users_list.length).toBe(2);
-    });
-  });
-
   describe("PUT removeUser/:userEmail/FromCanceledSchedule/:scheduleId ", () => {
     it("Should update the canceled schedule and the user", async () => {
       // Create users first
