@@ -8,7 +8,7 @@ import {
 } from "./model";
 import { User } from "../users";
 import { getCancelScheduleInfo } from "./logic";
-import { addCanceledSchedule, updateCanceledSchedule } from "./service";
+import { addCanceledSchedule, handleAddOrUpdate, updateCanceledSchedule } from "./service";
 import { checkIfUserExists } from "../users/service";
 
 export const deleteCanceledSchedule = async (
@@ -76,22 +76,10 @@ export const addOrUpdateCanceledSchedule = async (
 
     await checkIfUserExists(cancelScheduleInfo.userEmail);
 
-    let canceledScheduleResponse: CanceledSchedulesType;
-
-    const canceledSchedule = await CanceledSchedule.findOne({
-      hour_of_the_day: cancelScheduleInfo.scheduleHour,
-      day: cancelScheduleInfo.scheduleDay
-    });
-
-    if (canceledSchedule) {
-      canceledScheduleResponse = await updateCanceledSchedule(
-        canceledSchedule,
-        cancelScheduleInfo
-      );
-    } else {
-      canceledScheduleResponse = await addCanceledSchedule(cancelScheduleInfo);
-    }
+    const canceledScheduleResponse = await handleAddOrUpdate(cancelScheduleInfo);
+    
     response.send(canceledScheduleResponse);
+    
   } catch (error) {
     response.status(500).send({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
