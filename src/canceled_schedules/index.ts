@@ -1,2 +1,2 @@
 export { canceledScheduleRouter } from "./canceledSchedulesRouters";
-export { CanceledSchedule, CanceledSchedulesType } from "./canceledSchedule";
+export { CanceledSchedule, CanceledSchedulesType } from "./model";

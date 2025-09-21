@@ -1,4 +1,4 @@
-import { CancelScheduleInfo } from "./canceledSchedule";
+import { CancelScheduleInfo } from "./model";
 
 export const getCancelScheduleInfo = (request: any): CancelScheduleInfo => {
     const scheduleHour = request.body.hour;

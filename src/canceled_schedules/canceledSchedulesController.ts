@@ -1,9 +1,10 @@
 /** source/controllers/posts.ts */
 import { Request, Response } from "express";
 import { Document } from "mongoose";
-import { CanceledSchedule, CanceledSchedulesType, CancelScheduleInfo } from "./canceledSchedule";
+import { CanceledSchedule, CanceledSchedulesType, CancelScheduleInfo } from "./model";
 import { User } from "../users";
 import { getCancelScheduleInfo } from "./logic";
+import { updateCanceledSchedule } from "./service";
 
 export const deleteCanceledSchedule = async (
   request: Request,
@@ -59,24 +60,6 @@ export const removeUserFromCanceledSchedule = async (
   } catch (error) {
     response.status(500).send(error);
   }
-};
-
-export const updateCanceledSchedule = async (
-  canceledSchedule: Document & CanceledSchedulesType,
-  { scheduleHour, scheduleDay, userEmail }: CancelScheduleInfo
-): Promise<CanceledSchedulesType> => {
-
-  let updatedSchedule: CanceledSchedulesType = canceledSchedule;
-
-  if (!canceledSchedule.users_list.includes(userEmail)) {
-    await canceledSchedule.updateOne({ $push: { users_list: userEmail } });
-    updatedSchedule = await CanceledSchedule.findOne({
-      hour_of_the_day: scheduleHour,
-      day: scheduleDay
-    }) as CanceledSchedulesType;
-  } 
-
-  return updatedSchedule;
 };
 
 export const addOrUpdateCanceledSchedule = async (
