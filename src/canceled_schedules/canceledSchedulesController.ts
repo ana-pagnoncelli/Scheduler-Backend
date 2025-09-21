@@ -76,21 +76,22 @@ export const addOrUpdateCanceledSchedule = async (
 
     await checkIfUserExists(cancelScheduleInfo.userEmail);
 
+    let canceledScheduleResponse: CanceledSchedulesType;
+
     const canceledSchedule = await CanceledSchedule.findOne({
       hour_of_the_day: cancelScheduleInfo.scheduleHour,
       day: cancelScheduleInfo.scheduleDay
     });
 
     if (canceledSchedule) {
-      const updatedCanceledSchedule = await updateCanceledSchedule(
+      canceledScheduleResponse = await updateCanceledSchedule(
         canceledSchedule,
         cancelScheduleInfo
       );
-      response.send(updatedCanceledSchedule);
     } else {
-      const newCanceledSchedule = await addCanceledSchedule(cancelScheduleInfo);
-      response.send(newCanceledSchedule);
+      canceledScheduleResponse = await addCanceledSchedule(cancelScheduleInfo);
     }
+    response.send(canceledScheduleResponse);
   } catch (error) {
     response.status(500).send({ error: error instanceof Error ? error.message : 'Unknown error' });
   }

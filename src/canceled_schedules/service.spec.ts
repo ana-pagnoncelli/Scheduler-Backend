@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { CanceledSchedule, CanceledSchedulesType } from "./model";
-import { updateCanceledSchedule, addCanceledSchedule } from "./service";
+import { updateCanceledSchedule, addCanceledSchedule, handleAddOrUpdate } from "./service";
 import { userData, userData2 } from "../users/fixtures";
 
 describe("updateCanceledSchedule", () => {
@@ -385,5 +385,141 @@ describe("addCanceledSchedule", () => {
 
     expect(schedules).toHaveLength(1);
     expect(schedules[0]?.users_list).toEqual(["first@example.com"]);
+  });
+});
+
+describe("handleAddOrUpdate", () => {
+  beforeEach(async () => {
+    // Clean up any existing data before each test
+    await CanceledSchedule.deleteMany({});
+  });
+
+  afterEach(async () => {
+    // Clean up after each test
+    await CanceledSchedule.deleteMany({});
+  });
+
+  it("should add a new canceled schedule when none exists", async () => {
+    const scheduleInfo = {
+      scheduleHour: "15:30",
+      scheduleDay: "2023-06-10",
+      userEmail: "newuser@example.com"
+    };
+
+    const result = await handleAddOrUpdate(scheduleInfo);
+
+    expect(result).toBeDefined();
+    expect(result.id).toBe("2023-06-10_15:30");
+    expect(result.day).toBe("2023-06-10");
+    expect(result.hour_of_the_day).toBe("15:30");
+    expect(result.users_list).toEqual(["newuser@example.com"]);
+
+    // Verify the schedule was created in the database
+    const dbSchedule = await CanceledSchedule.findOne({
+      hour_of_the_day: "15:30",
+      day: "2023-06-10"
+    });
+    expect(dbSchedule).toBeDefined();
+    expect(dbSchedule?.users_list).toEqual(["newuser@example.com"]);
+  });
+
+  it("should update an existing canceled schedule when one exists", async () => {
+    // First, create an existing schedule
+    const existingSchedule = new CanceledSchedule({
+      id: "2023-07-15_18:00",
+      day: "2023-07-15",
+      hour_of_the_day: "18:00",
+      users_list: ["existing@user.com"]
+    });
+    await existingSchedule.save();
+
+    const scheduleInfo = {
+      scheduleHour: "18:00",
+      scheduleDay: "2023-07-15",
+      userEmail: "newuser@example.com"
+    };
+
+    const result = await handleAddOrUpdate(scheduleInfo);
+
+    expect(result).toBeDefined();
+    expect(result.id).toBe("2023-07-15_18:00");
+    expect(result.day).toBe("2023-07-15");
+    expect(result.hour_of_the_day).toBe("18:00");
+    expect(result.users_list).toContain("existing@user.com");
+    expect(result.users_list).toContain("newuser@example.com");
+    expect(result.users_list.length).toBe(2);
+
+    // Verify the schedule was updated in the database
+    const dbSchedule = await CanceledSchedule.findOne({
+      hour_of_the_day: "18:00",
+      day: "2023-07-15"
+    });
+    expect(dbSchedule).toBeDefined();
+    expect(dbSchedule?.users_list).toContain("existing@user.com");
+    expect(dbSchedule?.users_list).toContain("newuser@example.com");
+  });
+
+  it("should not add duplicate user when updating existing schedule", async () => {
+    // Create an existing schedule with a user
+    const existingSchedule = new CanceledSchedule({
+      id: "2023-08-20_12:00",
+      day: "2023-08-20",
+      hour_of_the_day: "12:00",
+      users_list: ["duplicate@user.com"]
+    });
+    await existingSchedule.save();
+
+    const scheduleInfo = {
+      scheduleHour: "12:00",
+      scheduleDay: "2023-08-20",
+      userEmail: "duplicate@user.com" // Same user as existing
+    };
+
+    const result = await handleAddOrUpdate(scheduleInfo);
+
+    expect(result).toBeDefined();
+    expect(result.users_list).toContain("duplicate@user.com");
+    expect(result.users_list.length).toBe(1); // Should not duplicate
+  });
+
+  it("should handle multiple calls to add different users to the same schedule", async () => {
+    const scheduleInfo1 = {
+      scheduleHour: "14:00",
+      scheduleDay: "2023-09-05",
+      userEmail: "first@user.com"
+    };
+
+    const scheduleInfo2 = {
+      scheduleHour: "14:00",
+      scheduleDay: "2023-09-05",
+      userEmail: "second@user.com"
+    };
+
+    // First call should create new schedule
+    const result1 = await handleAddOrUpdate(scheduleInfo1);
+    expect(result1.users_list).toEqual(["first@user.com"]);
+
+    // Second call should update existing schedule
+    const result2 = await handleAddOrUpdate(scheduleInfo2);
+    expect(result2.users_list).toContain("first@user.com");
+    expect(result2.users_list).toContain("second@user.com");
+    expect(result2.users_list.length).toBe(2);
+  });
+
+  it("should return the same result for identical subsequent calls", async () => {
+    const scheduleInfo = {
+      scheduleHour: "10:30",
+      scheduleDay: "2023-10-10",
+      userEmail: "consistent@user.com"
+    };
+
+    const result1 = await handleAddOrUpdate(scheduleInfo);
+    const result2 = await handleAddOrUpdate(scheduleInfo);
+
+    expect(result1).toBeDefined();
+    expect(result2).toBeDefined();
+    expect(result1.id).toBe(result2.id);
+    expect(result1.users_list).toEqual(result2.users_list);
+    expect(result1.users_list.length).toBe(1); // Should not duplicate
   });
 });

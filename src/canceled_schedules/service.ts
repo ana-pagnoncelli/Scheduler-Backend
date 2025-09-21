@@ -23,7 +23,11 @@ export const updateCanceledSchedule = async (
   return updatedSchedule;
 };
 
-export const addCanceledSchedule = async ({ scheduleHour, scheduleDay, userEmail }: CancelScheduleInfo): Promise<CanceledSchedulesType> => {
+export const addCanceledSchedule = async ({
+  scheduleHour,
+  scheduleDay,
+  userEmail
+}: CancelScheduleInfo): Promise<CanceledSchedulesType> => {
   const newCanceledSchedule = new CanceledSchedule({
     id: canceledScheduleUniqueId(scheduleDay, scheduleHour),
     hour_of_the_day: scheduleHour,
@@ -33,4 +37,25 @@ export const addCanceledSchedule = async ({ scheduleHour, scheduleDay, userEmail
   await newCanceledSchedule.save();
 
   return newCanceledSchedule;
+};
+
+export const handleAddOrUpdate = async (
+  cancelScheduleInfo: CancelScheduleInfo
+) => {
+  let canceledScheduleResponse: CanceledSchedulesType;
+
+  const canceledSchedule = await CanceledSchedule.findOne({
+    hour_of_the_day: cancelScheduleInfo.scheduleHour,
+    day: cancelScheduleInfo.scheduleDay
+  });
+
+  if (canceledSchedule) {
+    canceledScheduleResponse = await updateCanceledSchedule(
+      canceledSchedule,
+      cancelScheduleInfo
+    );
+  } else {
+    canceledScheduleResponse = await addCanceledSchedule(cancelScheduleInfo);
+  }
+  return canceledScheduleResponse;
 };
