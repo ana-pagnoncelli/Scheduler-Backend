@@ -1,11 +1,7 @@
 import request from "supertest";
 import { httpServer } from "../setupTests";
-import {
-  canceledScheduleData,
+import {  
   canceledScheduleDataWithOneUser,
-  canceledScheduleWithMissingData,
-  updatedCanceledScheduleData,
-  userDataWithSchedule,
   addCanceledScheduleData,
   addCanceledScheduleData2,
   newCanceledScheduleExpected,

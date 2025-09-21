@@ -1,14 +1,11 @@
 /** source/controllers/posts.ts */
-import { Request, response, Response } from "express";
-import { Document } from "mongoose";
+import { Request, Response } from "express";
 import {
   CanceledSchedule,
-  CanceledSchedulesType,
-  CancelScheduleInfo
 } from "./model";
 import { User } from "../users";
 import { getCancelScheduleInfo } from "./logic";
-import { addCanceledSchedule, handleAddOrUpdate, updateCanceledSchedule } from "./service";
+import { handleAddOrUpdate } from "./service";
 import { checkIfUserExists } from "../users/service";
 
 export const deleteCanceledSchedule = async (
