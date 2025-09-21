@@ -1,10 +1,15 @@
 /** source/controllers/posts.ts */
-import { Request, Response } from "express";
+import { Request, response, Response } from "express";
 import { Document } from "mongoose";
-import { CanceledSchedule, CanceledSchedulesType, CancelScheduleInfo } from "./model";
+import {
+  CanceledSchedule,
+  CanceledSchedulesType,
+  CancelScheduleInfo
+} from "./model";
 import { User } from "../users";
 import { getCancelScheduleInfo } from "./logic";
 import { addCanceledSchedule, updateCanceledSchedule } from "./service";
+import { checkIfUserExists } from "../users/service";
 
 export const deleteCanceledSchedule = async (
   request: Request,
@@ -69,11 +74,7 @@ export const addOrUpdateCanceledSchedule = async (
   try {
     const cancelScheduleInfo = getCancelScheduleInfo(request);
 
-    // Check if user exists
-    const user = await User.findOne({ email: cancelScheduleInfo.userEmail });
-    if (!user) {
-      return response.status(500).send({ error: "User not found" });
-    }
+    await checkIfUserExists(cancelScheduleInfo.userEmail);
 
     const canceledSchedule = await CanceledSchedule.findOne({
       hour_of_the_day: cancelScheduleInfo.scheduleHour,
@@ -81,13 +82,16 @@ export const addOrUpdateCanceledSchedule = async (
     });
 
     if (canceledSchedule) {
-      const updatedCanceledSchedule = await updateCanceledSchedule(canceledSchedule, cancelScheduleInfo);
+      const updatedCanceledSchedule = await updateCanceledSchedule(
+        canceledSchedule,
+        cancelScheduleInfo
+      );
       response.send(updatedCanceledSchedule);
     } else {
       const newCanceledSchedule = await addCanceledSchedule(cancelScheduleInfo);
       response.send(newCanceledSchedule);
     }
   } catch (error) {
-    response.status(500).send(error);
+    response.status(500).send({ error: error instanceof Error ? error.message : 'Unknown error' });
   }
 };
