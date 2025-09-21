@@ -1,4 +1,4 @@
-import { getCancelScheduleInfo } from "./logic";
+import { getCancelScheduleInfo, canceledScheduleUniqueId } from "./logic";
 import { CancelScheduleInfo } from "./model";
 
 describe("getCancelScheduleInfo", () => {
@@ -75,4 +75,23 @@ describe("getCancelScheduleInfo", () => {
     expect(result).toEqual(expectedResult);
   });
 
+});
+
+describe("canceledScheduleUniqueId", () => {
+  it("should create a unique ID by combining schedule day and hour with underscore", () => {
+    const scheduleDay = "2023-04-21";
+    const scheduleHour = "19:00";
+    const expectedId = "2023-04-21_19:00";
+
+    const result = canceledScheduleUniqueId(scheduleDay, scheduleHour);
+    expect(result).toBe(expectedId);
+  });
+
+  it("should return a string type", () => {
+    const scheduleDay = "2023-04-21";
+    const scheduleHour = "19:00";
+
+    const result = canceledScheduleUniqueId(scheduleDay, scheduleHour);
+    expect(typeof result).toBe("string");
+  });
 });

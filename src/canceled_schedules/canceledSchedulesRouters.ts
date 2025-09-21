@@ -2,7 +2,6 @@
 import { Router } from "express";
 import {
   addOrUpdateCanceledSchedule,
-  updateCanceledSchedule,
   deleteCanceledSchedule,
   getCanceledSchedule,
   removeUserFromCanceledSchedule
