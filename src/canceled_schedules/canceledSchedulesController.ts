@@ -4,7 +4,7 @@ import { Document } from "mongoose";
 import { CanceledSchedule, CanceledSchedulesType, CancelScheduleInfo } from "./model";
 import { User } from "../users";
 import { getCancelScheduleInfo } from "./logic";
-import { updateCanceledSchedule } from "./service";
+import { addCanceledSchedule, updateCanceledSchedule } from "./service";
 
 export const deleteCanceledSchedule = async (
   request: Request,
@@ -84,13 +84,7 @@ export const addOrUpdateCanceledSchedule = async (
       const updatedCanceledSchedule = await updateCanceledSchedule(canceledSchedule, cancelScheduleInfo);
       response.send(updatedCanceledSchedule);
     } else {
-      const newCanceledSchedule = new CanceledSchedule({
-        id: `${cancelScheduleInfo.scheduleDay}_${cancelScheduleInfo.scheduleHour}`,
-        hour_of_the_day: cancelScheduleInfo.scheduleHour,
-        day: cancelScheduleInfo.scheduleDay,
-        users_list: [cancelScheduleInfo.userEmail]
-      });
-      await newCanceledSchedule.save();
+      const newCanceledSchedule = await addCanceledSchedule(cancelScheduleInfo);
       response.send(newCanceledSchedule);
     }
   } catch (error) {
