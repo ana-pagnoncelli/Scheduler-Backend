@@ -30,3 +30,9 @@ export const CanceledSchedule = mongoose.model(
   "CanceledSchedule",
   CanceledScheduleSchema
 );
+
+export type CancelScheduleInfo = {
+  scheduleHour: string;
+  scheduleDay: string;
+  userEmail: string;
+}

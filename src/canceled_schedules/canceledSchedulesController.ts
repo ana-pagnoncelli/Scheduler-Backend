@@ -1,7 +1,9 @@
 /** source/controllers/posts.ts */
 import { Request, Response } from "express";
-import { CanceledSchedule } from "./canceledSchedule";
+import { Document } from "mongoose";
+import { CanceledSchedule, CanceledSchedulesType, CancelScheduleInfo } from "./canceledSchedule";
 import { User } from "../users";
+import { getCancelScheduleInfo } from "./logic";
 
 export const deleteCanceledSchedule = async (
   request: Request,
@@ -59,7 +61,22 @@ export const removeUserFromCanceledSchedule = async (
   }
 };
 
-export const updateCanceledSchedule = () => {
+export const updateCanceledSchedule = async (
+  canceledSchedule: Document & CanceledSchedulesType,
+  { scheduleHour, scheduleDay, userEmail }: CancelScheduleInfo
+): Promise<CanceledSchedulesType> => {
+
+  let updatedSchedule: CanceledSchedulesType = canceledSchedule;
+
+  if (!canceledSchedule.users_list.includes(userEmail)) {
+    await canceledSchedule.updateOne({ $push: { users_list: userEmail } });
+    updatedSchedule = await CanceledSchedule.findOne({
+      hour_of_the_day: scheduleHour,
+      day: scheduleDay
+    }) as CanceledSchedulesType;
+  } 
+
+  return updatedSchedule;
 };
 
 export const addOrUpdateCanceledSchedule = async (
@@ -67,39 +84,28 @@ export const addOrUpdateCanceledSchedule = async (
   response: Response
 ) => {
   try {
-    const scheduleHour = request.body.hour;
-    const scheduleDay = request.body.day;
-    const userEmail = request.body.userEmail;
+    const cancelScheduleInfo = getCancelScheduleInfo(request);
 
     // Check if user exists
-    const user = await User.findOne({ email: userEmail });
+    const user = await User.findOne({ email: cancelScheduleInfo.userEmail });
     if (!user) {
       return response.status(500).send({ error: "User not found" });
     }
 
     const canceledSchedule = await CanceledSchedule.findOne({
-      hour_of_the_day: scheduleHour,
-      day: scheduleDay
+      hour_of_the_day: cancelScheduleInfo.scheduleHour,
+      day: cancelScheduleInfo.scheduleDay
     });
 
     if (canceledSchedule) {
-      // Only add user if they're not already in the list
-      if (!canceledSchedule.users_list.includes(userEmail)) {
-        await canceledSchedule.updateOne({ $push: { users_list: userEmail } });
-        const updatedSchedule = await CanceledSchedule.findOne({
-          hour_of_the_day: scheduleHour,
-          day: scheduleDay
-        });
-        return response.send(updatedSchedule);
-      } else {
-        return response.send(canceledSchedule);
-      }
+      const updatedCanceledSchedule = await updateCanceledSchedule(canceledSchedule, cancelScheduleInfo);
+      response.send(updatedCanceledSchedule);
     } else {
       const newCanceledSchedule = new CanceledSchedule({
-        id: `${scheduleDay}_${scheduleHour}`,
-        hour_of_the_day: scheduleHour,
-        day: scheduleDay,
-        users_list: [userEmail]
+        id: `${cancelScheduleInfo.scheduleDay}_${cancelScheduleInfo.scheduleHour}`,
+        hour_of_the_day: cancelScheduleInfo.scheduleHour,
+        day: cancelScheduleInfo.scheduleDay,
+        users_list: [cancelScheduleInfo.userEmail]
       });
       await newCanceledSchedule.save();
       response.send(newCanceledSchedule);
