@@ -1,19 +1,9 @@
 import { Request, Response } from "express";
 import { VariableSchedule } from "./variableSchedule";
 import { User } from "../users";
-
-export const addVariableSchedule = async (
-  request: Request,
-  response: Response
-) => {
-  try {
-    const variableSchedule = new VariableSchedule(request.body);
-    await variableSchedule.save();
-    response.send(variableSchedule);
-  } catch (error) {
-    response.status(500).send(error);
-  }
-};
+import { getVariableScheduleInfo } from "./logic";
+import { handleAddOrUpdate } from "./service";
+import { checkIfUserExists } from "../users/service";
 
 export const updateVariableSchedule = async (
   request: Request,
@@ -120,6 +110,21 @@ export const removeUserFromVariableSchedule = async (
     );
 
     response.status(200).send(variableSchedule);
+  } catch (error) {
+    response.status(500).send(error);
+  }
+};
+
+export const addOrUpdateVariableSchedule = async (
+  request: Request,
+  response: Response
+) => {
+  try {
+    const variableScheduleInfo = getVariableScheduleInfo(request);
+    await checkIfUserExists(variableScheduleInfo.userEmail);
+    const variableScheduleResponse = await handleAddOrUpdate(variableScheduleInfo);
+    response.status(200).send(variableScheduleResponse);
+
   } catch (error) {
     response.status(500).send(error);
   }

@@ -44,3 +44,9 @@ export type SchedulesReturn = {
   availableSpots: number;
   hours: Hour[];
 };
+
+export type VariableScheduleInfo = {
+  scheduleHour: string;
+  scheduleDay: string;
+  userEmail: string;
+}

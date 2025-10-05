@@ -3,7 +3,6 @@ import { httpServer } from "../setupTests";
 import {
   variableScheduleData,
   variableScheduleDataWithOneUser,
-  variableScheduleWithMissingData,
   updatedVariableScheduleData,
   userDataWithSchedule,
   scheduleData2,
@@ -15,21 +14,6 @@ import { scheduleData } from "../fixed_schedules/fixtures";
 import { SchedulesReturn } from "./variableSchedule";
 
 describe("Variable Schedules", () => {
-  describe("POST / ", () => {
-    it("Should create a variable schedule when all required fields are given", async () => {
-      const response = await request(httpServer)
-        .post("/variableSchedules")
-        .send(variableScheduleData);
-      expect(response.statusCode).toBe(200);
-    });
-    it("Should not create a variable schedule when a field is missing", async () => {
-      const response = await request(httpServer)
-        .post("/variableSchedules")
-        .send(variableScheduleWithMissingData);
-      expect(response.statusCode).toBe(500);
-    });
-  });
-
   describe("GET /:id ", () => {
     it("Should return the searched variable schedule", async () => {
       await request(httpServer)
@@ -131,15 +115,15 @@ describe("Variable Schedules", () => {
           day: "2023-04-20",
           numberOfSpots: 2,
           availableSpots: 2,
-          hours: [{ hour: "18:00", numberOfSpots: 2, availableSpots: 2 }]
+          hours: [{ hour: "18:00", numberOfSpots: 2, availableSpots: 2, usersList: [] }]
         },
         {
           day: "2023-04-21",
           numberOfSpots: 4,
           availableSpots: 2,
           hours: [
-            { hour: "11:00", numberOfSpots: 2, availableSpots: 1 },
-            { hour: "15:00", numberOfSpots: 2, availableSpots: 1 }
+            { hour: "11:00", numberOfSpots: 2, availableSpots: 1, usersList: [] },
+            { hour: "15:00", numberOfSpots: 2, availableSpots: 1, usersList: [] }
           ]
         }
       ];
