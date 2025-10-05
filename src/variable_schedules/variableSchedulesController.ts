@@ -4,6 +4,7 @@ import { User } from "../users";
 import { getVariableScheduleInfo } from "./logic";
 import { handleAddOrUpdate } from "./service";
 import { checkIfUserExists } from "../users/service";
+import { userWasInCanceledSchedule } from "../canceled_schedules/service";
 
 export const updateVariableSchedule = async (
   request: Request,
@@ -118,9 +119,13 @@ export const addOrUpdateVariableSchedule = async (
   try {
     const variableScheduleInfo = getVariableScheduleInfo(request);
     await checkIfUserExists(variableScheduleInfo.userEmail);
-    const variableScheduleResponse = await handleAddOrUpdate(variableScheduleInfo);
-    response.status(200).send(variableScheduleResponse);
 
+    if (await userWasInCanceledSchedule(variableScheduleInfo)) {
+      response.status(200).send("User was removed from canceled schedule");
+    } else {
+      const variableScheduleResponse = await handleAddOrUpdate(variableScheduleInfo);
+      response.status(200).send(variableScheduleResponse);
+    }
   } catch (error) {
     response.status(500).send(error);
   }

@@ -12,6 +12,7 @@ import { SchedulesReturn } from "./model";
 import { VariableSchedule } from "./model";
 import { User } from "../users";
 import { Schedule } from "../fixed_schedules";
+import { CanceledSchedule } from "../canceled_schedules";
 
 describe("Variable Schedules", () => {
   beforeEach(async () => {
@@ -19,6 +20,7 @@ describe("Variable Schedules", () => {
     await VariableSchedule.deleteMany({});
     await User.deleteMany({});
     await Schedule.deleteMany({});
+    await CanceledSchedule.deleteMany({});
   });
   describe("GET /:id ", () => {
     it("Should return the searched variable schedule", async () => {
@@ -371,6 +373,42 @@ describe("Variable Schedules", () => {
         .send({});
 
       expect(response.statusCode).toBe(500);
+    });
+
+    it("Should return message when user was in canceled schedule", async () => {
+      // Create user
+      await request(httpServer).post("/users").send(userData);
+
+      // Create a canceled schedule with the user using the correct format
+      const canceledScheduleData = {
+        hour: "20:00",
+        day: "2023-05-19",
+        userEmail: userData.email
+      };
+
+      await request(httpServer)
+        .post("/canceledSchedules")
+        .send(canceledScheduleData);
+
+      // Try to add the same user to a variable schedule for the same time
+      const scheduleData = {
+        hour: "20:00",
+        day: "2023-05-19",
+        userEmail: userData.email
+      };
+
+      const response = await request(httpServer)
+        .post("/variableSchedules")
+        .send(scheduleData);
+
+      expect(response.statusCode).toBe(200);
+      expect(response.text).toBe("User was removed from canceled schedule");
+
+      // Verify the user was removed from the canceled schedule
+      const canceledScheduleResponse = await request(httpServer)
+        .get("/canceledSchedules/2023-05-19_20:00");
+      
+      expect(canceledScheduleResponse.body.users_list).not.toContain(userData.email);
     });
   });
 });
