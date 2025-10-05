@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { VariableSchedule } from "./variableSchedule";
+import { VariableSchedule } from "./model";
 import { User } from "../users";
 import { getVariableScheduleInfo } from "./logic";
 import { handleAddOrUpdate } from "./service";

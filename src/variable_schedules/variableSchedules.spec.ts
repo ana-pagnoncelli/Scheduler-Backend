@@ -8,8 +8,8 @@ import {
 } from "./fixtures";
 import { userData, userData2 } from "../users/fixtures";
 import { scheduleData } from "../fixed_schedules/fixtures";
-import { SchedulesReturn } from "./variableSchedule";
-import { VariableSchedule } from "./variableSchedule";
+import { SchedulesReturn } from "./model";
+import { VariableSchedule } from "./model";
 import { User } from "../users";
 import { Schedule } from "../fixed_schedules";
 

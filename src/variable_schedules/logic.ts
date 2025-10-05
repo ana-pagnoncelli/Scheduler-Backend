@@ -1,4 +1,4 @@
-import { VariableScheduleInfo } from "./variableSchedule";
+import { VariableScheduleInfo } from "./model";
 
 export const getVariableScheduleInfo = (request: any): VariableScheduleInfo => {
     const scheduleHour = request.body.hour;

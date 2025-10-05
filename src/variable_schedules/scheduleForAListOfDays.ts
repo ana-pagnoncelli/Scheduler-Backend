@@ -8,7 +8,7 @@ import {
   SchedulesReturn,
   VariableSchedule,
   VariableScheduleType
-} from "./variableSchedule";
+} from "./model";
 import { Schedule, ScheduleType } from "../fixed_schedules";
 import { CanceledSchedule, CanceledSchedulesType } from "../canceled_schedules";
 

@@ -1,5 +1,5 @@
 import { getVariableScheduleInfo, variableScheduleUniqueId } from "./logic";
-import { VariableScheduleInfo } from "./variableSchedule";
+import { VariableScheduleInfo } from "./model";
 
 describe("Variable Schedules Logic", () => {
   describe("getVariableScheduleInfo", () => {

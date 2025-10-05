@@ -13,7 +13,7 @@ import {
   fixedScheduleTuesday1730
 } from "./fixtures";
 import { scheduleData } from "../fixed_schedules/fixtures";
-import { SchedulesReturn, VariableScheduleType } from "./variableSchedule";
+import { SchedulesReturn, VariableScheduleType } from "./model";
 import { ScheduleType } from "../fixed_schedules";
 import {
   applyCanceledSchedules,

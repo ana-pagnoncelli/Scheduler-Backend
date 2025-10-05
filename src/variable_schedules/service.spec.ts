@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { VariableSchedule, VariableScheduleType } from "./variableSchedule";
+import { VariableSchedule, VariableScheduleType } from "./model";
 import { updateVariableSchedule, addVariableSchedule, handleAddOrUpdate } from "./service";
 
 describe("Variable Schedules Service", () => {

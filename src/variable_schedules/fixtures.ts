@@ -1,7 +1,7 @@
 import { CanceledSchedulesType } from "../canceled_schedules";
 import { ScheduleType } from "../fixed_schedules";
 import { userData, userData2 } from "../users/fixtures";
-import { VariableScheduleType } from "./variableSchedule";
+import { VariableScheduleType } from "./model";
 
 const variableScheduleBaseData = {
   id: "1",

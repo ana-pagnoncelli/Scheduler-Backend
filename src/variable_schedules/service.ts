@@ -3,7 +3,7 @@ import {
   VariableSchedule,
   VariableScheduleType,
   VariableScheduleInfo
-} from "./variableSchedule";
+} from "./model";
 import { Document } from "mongoose";
 
 export const updateVariableSchedule = async (

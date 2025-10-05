@@ -1,7 +1,12 @@
 import mongoose from "mongoose";
 import { CanceledSchedule, CanceledSchedulesType } from "./model";
-import { updateCanceledSchedule, addCanceledSchedule, handleAddOrUpdate } from "./service";
-import { userData, userData2 } from "../users/fixtures";
+import {
+  addUnserInCanceledSchedule,
+  addCanceledSchedule,
+  handleAddOrUpdate,
+  removeUserFromCanceledSchedule,
+  userWasInCanceledSchedule
+} from "./service";
 
 describe("updateCanceledSchedule", () => {
   let testCanceledSchedule: mongoose.Document & CanceledSchedulesType;
@@ -9,7 +14,7 @@ describe("updateCanceledSchedule", () => {
   beforeEach(async () => {
     // Clean up any existing data
     await CanceledSchedule.deleteMany({});
-    
+
     // Create a test canceled schedule
     testCanceledSchedule = new CanceledSchedule({
       id: "2023-04-21_19:00",
@@ -17,7 +22,7 @@ describe("updateCanceledSchedule", () => {
       hour_of_the_day: "19:00",
       users_list: ["existing@user.com"]
     });
-    
+
     await testCanceledSchedule.save();
   });
 
@@ -33,7 +38,10 @@ describe("updateCanceledSchedule", () => {
       userEmail: "new@user.com"
     };
 
-    const result = await updateCanceledSchedule(testCanceledSchedule, scheduleInfo);
+    const result = await addUnserInCanceledSchedule(
+      testCanceledSchedule,
+      scheduleInfo
+    );
 
     expect(result).toBeDefined();
     expect(result.users_list).toContain("existing@user.com");
@@ -51,7 +59,10 @@ describe("updateCanceledSchedule", () => {
       userEmail: "existing@user.com" // This user is already in the list
     };
 
-    const result = await updateCanceledSchedule(testCanceledSchedule, scheduleInfo);
+    const result = await addUnserInCanceledSchedule(
+      testCanceledSchedule,
+      scheduleInfo
+    );
 
     expect(result).toBeDefined();
     expect(result.users_list).toContain("existing@user.com");
@@ -69,7 +80,7 @@ describe("updateCanceledSchedule", () => {
       userEmail: "first@user.com"
     };
 
-    await updateCanceledSchedule(testCanceledSchedule, scheduleInfo1);
+    await addUnserInCanceledSchedule(testCanceledSchedule, scheduleInfo1);
 
     // Then add another user
     const scheduleInfo2 = {
@@ -78,7 +89,10 @@ describe("updateCanceledSchedule", () => {
       userEmail: "second@user.com"
     };
 
-    const result = await updateCanceledSchedule(testCanceledSchedule, scheduleInfo2);
+    const result = await addUnserInCanceledSchedule(
+      testCanceledSchedule,
+      scheduleInfo2
+    );
 
     expect(result).toBeDefined();
     expect(result.users_list).toContain("existing@user.com");
@@ -94,7 +108,10 @@ describe("updateCanceledSchedule", () => {
       userEmail: "database@user.com"
     };
 
-    const result = await updateCanceledSchedule(testCanceledSchedule, scheduleInfo);
+    const result = await addUnserInCanceledSchedule(
+      testCanceledSchedule,
+      scheduleInfo
+    );
 
     // Verify the result matches what's in the database
     const dbSchedule = await CanceledSchedule.findOne({
@@ -118,7 +135,7 @@ describe("updateCanceledSchedule", () => {
       hour_of_the_day: "20:00",
       users_list: []
     });
-    
+
     await emptySchedule.save();
 
     const scheduleInfo = {
@@ -127,7 +144,10 @@ describe("updateCanceledSchedule", () => {
       userEmail: "first@user.com"
     };
 
-    const result = await updateCanceledSchedule(emptySchedule, scheduleInfo);
+    const result = await addUnserInCanceledSchedule(
+      emptySchedule,
+      scheduleInfo
+    );
 
     expect(result).toBeDefined();
     expect(result.users_list).toContain("first@user.com");
@@ -142,16 +162,19 @@ describe("updateCanceledSchedule", () => {
     };
 
     // Add the same user twice - first call
-    await updateCanceledSchedule(testCanceledSchedule, scheduleInfo);
-    
+    await addUnserInCanceledSchedule(testCanceledSchedule, scheduleInfo);
+
     // Get fresh document from database for second call
-    const freshDocument = await CanceledSchedule.findOne({
+    const freshDocument = (await CanceledSchedule.findOne({
       hour_of_the_day: "19:00",
       day: "2023-04-21"
-    }) as mongoose.Document & CanceledSchedulesType;
-    
+    })) as mongoose.Document & CanceledSchedulesType;
+
     // Second call with fresh document should not add duplicate
-    const result = await updateCanceledSchedule(freshDocument, scheduleInfo);
+    const result = await addUnserInCanceledSchedule(
+      freshDocument,
+      scheduleInfo
+    );
 
     expect(result).toBeDefined();
     expect(result.users_list).toContain("existing@user.com");
@@ -166,7 +189,10 @@ describe("updateCanceledSchedule", () => {
       userEmail: "user+tag@example.com"
     };
 
-    const result = await updateCanceledSchedule(testCanceledSchedule, scheduleInfo);
+    const result = await addUnserInCanceledSchedule(
+      testCanceledSchedule,
+      scheduleInfo
+    );
 
     expect(result).toBeDefined();
     expect(result.users_list).toContain("existing@user.com");
@@ -175,14 +201,18 @@ describe("updateCanceledSchedule", () => {
   });
 
   it("should handle long user email addresses", async () => {
-    const longEmail = "very.long.email.address.that.might.test.edge.cases@verylongdomainname.com";
+    const longEmail =
+      "very.long.email.address.that.might.test.edge.cases@verylongdomainname.com";
     const scheduleInfo = {
       scheduleHour: "19:00",
       scheduleDay: "2023-04-21",
       userEmail: longEmail
     };
 
-    const result = await updateCanceledSchedule(testCanceledSchedule, scheduleInfo);
+    const result = await addUnserInCanceledSchedule(
+      testCanceledSchedule,
+      scheduleInfo
+    );
 
     expect(result).toBeDefined();
     expect(result.users_list).toContain("existing@user.com");
@@ -242,7 +272,8 @@ describe("addCanceledSchedule", () => {
   });
 
   it("should handle long user email addresses", async () => {
-    const longEmail = "very.long.email.address.that.might.test.edge.cases@verylongdomainname.com";
+    const longEmail =
+      "very.long.email.address.that.might.test.edge.cases@verylongdomainname.com";
     const scheduleInfo = {
       scheduleHour: "08:15",
       scheduleDay: "2023-07-04",
@@ -521,5 +552,300 @@ describe("handleAddOrUpdate", () => {
     expect(result1.id).toBe(result2.id);
     expect(result1.users_list).toEqual(result2.users_list);
     expect(result1.users_list.length).toBe(1); // Should not duplicate
+  });
+});
+
+describe("removeUserFromCanceledSchedule", () => {
+  let testCanceledSchedule: mongoose.Document & CanceledSchedulesType;
+
+  beforeEach(async () => {
+    // Clean up any existing data
+    await CanceledSchedule.deleteMany({});
+
+    // Create a test canceled schedule with multiple users
+    testCanceledSchedule = new CanceledSchedule({
+      id: "2023-04-21_19:00",
+      day: "2023-04-21",
+      hour_of_the_day: "19:00",
+      users_list: [
+        "user1@example.com",
+        "user2@example.com",
+        "user3@example.com"
+      ]
+    });
+
+    await testCanceledSchedule.save();
+  });
+
+  afterEach(async () => {
+    // Clean up after each test
+    await CanceledSchedule.deleteMany({});
+  });
+
+  it("should remove a user from the users_list", async () => {
+    const userEmail = "user2@example.com";
+
+    const result = await removeUserFromCanceledSchedule(
+      testCanceledSchedule,
+      userEmail
+    );
+
+    expect(result).toBeDefined();
+    expect(result).toBe(testCanceledSchedule); // Should return the same document object
+
+    // Verify the user was removed from the database
+    const updatedSchedule = await CanceledSchedule.findOne({
+      hour_of_the_day: "19:00",
+      day: "2023-04-21"
+    });
+    expect(updatedSchedule?.users_list).not.toContain("user2@example.com");
+    expect(updatedSchedule?.users_list).toContain("user1@example.com");
+    expect(updatedSchedule?.users_list).toContain("user3@example.com");
+    expect(updatedSchedule?.users_list.length).toBe(2);
+  });
+  it("should handle removing a user that is not in the list gracefully", async () => {
+    const userEmail = "nonexistent@example.com";
+
+    const result = await removeUserFromCanceledSchedule(
+      testCanceledSchedule,
+      userEmail
+    );
+
+    expect(result).toBeDefined();
+    expect(result.users_list).toContain("user1@example.com");
+    expect(result.users_list).toContain("user2@example.com");
+    expect(result.users_list).toContain("user3@example.com");
+    expect(result.users_list.length).toBe(3); // Should remain unchanged
+  });
+
+  it("should handle removing the last user from the list", async () => {
+    // Create a schedule with only one user
+    const singleUserSchedule = new CanceledSchedule({
+      id: "2023-04-22_20:00",
+      day: "2023-04-22",
+      hour_of_the_day: "20:00",
+      users_list: ["onlyuser@example.com"]
+    });
+    await singleUserSchedule.save();
+
+    const result = await removeUserFromCanceledSchedule(
+      singleUserSchedule,
+      "onlyuser@example.com"
+    );
+
+    expect(result).toBeDefined();
+    expect(result).toBe(singleUserSchedule);
+
+    // Verify the user was removed from the database
+    const updatedSchedule = await CanceledSchedule.findOne({
+      hour_of_the_day: "20:00",
+      day: "2023-04-22"
+    });
+    expect(updatedSchedule?.users_list).not.toContain("onlyuser@example.com");
+    expect(updatedSchedule?.users_list.length).toBe(0);
+  });
+
+  it("should handle removing a user from an empty list", async () => {
+    // Create a schedule with no users
+    const emptySchedule = new CanceledSchedule({
+      id: "2023-04-23_21:00",
+      day: "2023-04-23",
+      hour_of_the_day: "21:00",
+      users_list: []
+    });
+    await emptySchedule.save();
+
+    const result = await removeUserFromCanceledSchedule(
+      emptySchedule,
+      "anyuser@example.com"
+    );
+
+    expect(result).toBeDefined();
+    expect(result.users_list.length).toBe(0);
+  });
+
+  it("should handle removing multiple users sequentially", async () => {
+    // Remove first user
+    let result = await removeUserFromCanceledSchedule(
+      testCanceledSchedule,
+      "user1@example.com"
+    );
+    expect(result).toBe(testCanceledSchedule);
+
+    // Verify first user was removed from database
+    let updatedSchedule = await CanceledSchedule.findOne({
+      hour_of_the_day: "19:00",
+      day: "2023-04-21"
+    });
+    expect(updatedSchedule?.users_list).not.toContain("user1@example.com");
+    expect(updatedSchedule?.users_list.length).toBe(2);
+
+    // Remove second user
+    result = await removeUserFromCanceledSchedule(
+      testCanceledSchedule,
+      "user2@example.com"
+    );
+    expect(result).toBe(testCanceledSchedule);
+
+    // Verify second user was removed from database
+    updatedSchedule = await CanceledSchedule.findOne({
+      hour_of_the_day: "19:00",
+      day: "2023-04-21"
+    });
+    expect(updatedSchedule?.users_list).not.toContain("user2@example.com");
+    expect(updatedSchedule?.users_list.length).toBe(1);
+    expect(updatedSchedule?.users_list).toContain("user3@example.com");
+  });
+
+  it("should handle case-sensitive email matching", async () => {
+    const userEmail = "USER1@EXAMPLE.COM"; // Different case
+
+    const result = await removeUserFromCanceledSchedule(
+      testCanceledSchedule,
+      userEmail
+    );
+
+    // Should not remove the user due to case sensitivity
+    expect(result.users_list).toContain("user1@example.com");
+    expect(result.users_list.length).toBe(3);
+  });
+});
+
+describe("userWasInCanceledSchedule", () => {
+  beforeEach(async () => {
+    // Clean up any existing data
+    await CanceledSchedule.deleteMany({});
+  });
+
+  afterEach(async () => {
+    // Clean up after each test
+    await CanceledSchedule.deleteMany({});
+  });
+
+  it("should return true and remove user when user exists in canceled schedule", async () => {
+    // Create a canceled schedule with a user
+    const canceledSchedule = new CanceledSchedule({
+      id: "2023-04-21_19:00",
+      day: "2023-04-21",
+      hour_of_the_day: "19:00",
+      users_list: ["test@example.com", "other@example.com"]
+    });
+    await canceledSchedule.save();
+
+    const scheduleInfo = {
+      scheduleHour: "19:00",
+      scheduleDay: "2023-04-21",
+      userEmail: "test@example.com"
+    };
+
+    const result = await userWasInCanceledSchedule(scheduleInfo);
+
+    expect(result).toBe(true);
+
+    // Verify the user was removed from the schedule
+    const updatedSchedule = await CanceledSchedule.findOne({
+      hour_of_the_day: "19:00",
+      day: "2023-04-21"
+    });
+    expect(updatedSchedule).toBeDefined();
+    expect(updatedSchedule?.users_list).not.toContain("test@example.com");
+    expect(updatedSchedule?.users_list).toContain("other@example.com");
+    expect(updatedSchedule?.users_list.length).toBe(1);
+  });
+
+  it("should return false when user does not exist in canceled schedule", async () => {
+    // Create a canceled schedule without the target user
+    const canceledSchedule = new CanceledSchedule({
+      id: "2023-04-21_19:00",
+      day: "2023-04-21",
+      hour_of_the_day: "19:00",
+      users_list: ["other@example.com"]
+    });
+    await canceledSchedule.save();
+
+    const scheduleInfo = {
+      scheduleHour: "19:00",
+      scheduleDay: "2023-04-21",
+      userEmail: "test@example.com"
+    };
+
+    const result = await userWasInCanceledSchedule(scheduleInfo);
+
+    expect(result).toBe(false);
+
+    // Verify the schedule was not modified
+    const unchangedSchedule = await CanceledSchedule.findOne({
+      hour_of_the_day: "19:00",
+      day: "2023-04-21"
+    });
+    expect(unchangedSchedule?.users_list).toEqual(["other@example.com"]);
+  });
+
+  it("should return false when no canceled schedule exists for the given time", async () => {
+    const scheduleInfo = {
+      scheduleHour: "20:00",
+      scheduleDay: "2023-04-22",
+      userEmail: "test@example.com"
+    };
+
+    const result = await userWasInCanceledSchedule(scheduleInfo);
+
+    expect(result).toBe(false);
+  });
+
+  it("should return false when canceled schedule exists but has empty users_list", async () => {
+    // Create a canceled schedule with empty users list
+    const canceledSchedule = new CanceledSchedule({
+      id: "2023-04-21_19:00",
+      day: "2023-04-21",
+      hour_of_the_day: "19:00",
+      users_list: []
+    });
+    await canceledSchedule.save();
+
+    const scheduleInfo = {
+      scheduleHour: "19:00",
+      scheduleDay: "2023-04-21",
+      userEmail: "test@example.com"
+    };
+
+    const result = await userWasInCanceledSchedule(scheduleInfo);
+
+    expect(result).toBe(false);
+  });
+
+  it("should handle multiple users in the same schedule correctly", async () => {
+    // Create a canceled schedule with multiple users
+    const canceledSchedule = new CanceledSchedule({
+      id: "2023-04-21_19:00",
+      day: "2023-04-21",
+      hour_of_the_day: "19:00",
+      users_list: [
+        "user1@example.com",
+        "user2@example.com",
+        "user3@example.com"
+      ]
+    });
+    await canceledSchedule.save();
+
+    const scheduleInfo = {
+      scheduleHour: "19:00",
+      scheduleDay: "2023-04-21",
+      userEmail: "user2@example.com"
+    };
+
+    const result = await userWasInCanceledSchedule(scheduleInfo);
+
+    expect(result).toBe(true);
+
+    // Verify only the target user was removed
+    const updatedSchedule = await CanceledSchedule.findOne({
+      hour_of_the_day: "19:00",
+      day: "2023-04-21"
+    });
+    expect(updatedSchedule?.users_list).toContain("user1@example.com");
+    expect(updatedSchedule?.users_list).not.toContain("user2@example.com");
+    expect(updatedSchedule?.users_list).toContain("user3@example.com");
+    expect(updatedSchedule?.users_list.length).toBe(2);
   });
 });

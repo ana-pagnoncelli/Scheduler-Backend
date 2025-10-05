@@ -6,7 +6,7 @@ import {
 } from "./model";
 import { Document } from "mongoose";
 
-export const updateCanceledSchedule = async (
+export const addUnserInCanceledSchedule = async (
   canceledSchedule: Document & CanceledSchedulesType,
   { scheduleHour, scheduleDay, userEmail }: CancelScheduleInfo
 ): Promise<CanceledSchedulesType> => {
@@ -22,6 +22,30 @@ export const updateCanceledSchedule = async (
 
   return updatedSchedule;
 };
+
+export const removeUserFromCanceledSchedule = async (
+  canceledSchedule: Document & CanceledSchedulesType,
+  userEmail: string
+): Promise<CanceledSchedulesType> => {
+  await canceledSchedule.updateOne({ $pull: { users_list: userEmail } });
+  return canceledSchedule;
+};
+
+export const userWasInCanceledSchedule = async (
+  { scheduleHour, scheduleDay, userEmail }: CancelScheduleInfo
+): Promise<boolean> => {
+  const canceledSchedule = await CanceledSchedule.findOne({
+    hour_of_the_day: scheduleHour,
+    day: scheduleDay
+  });
+
+  if (canceledSchedule?.users_list.includes(userEmail)) {
+    await removeUserFromCanceledSchedule(canceledSchedule, userEmail);
+    return true;
+  }
+  return false;
+};
+
 
 export const addCanceledSchedule = async ({
   scheduleHour,
@@ -50,7 +74,7 @@ export const handleAddOrUpdate = async (
   });
 
   if (canceledSchedule) {
-    canceledScheduleResponse = await updateCanceledSchedule(
+    canceledScheduleResponse = await addUnserInCanceledSchedule(
       canceledSchedule,
       cancelScheduleInfo
     );
