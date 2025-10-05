@@ -60,20 +60,18 @@ export const addUserInVariableSchedule = async (
   try {
     const { userEmail, scheduleId } = request.params;
 
-    const variableSchedule = new VariableSchedule(
-      await VariableSchedule.findOneAndUpdate(
-        { id: scheduleId },
-        { $push: { users_list: userEmail } },
-        {
-          new: true
-        }
-      )
+    const variableSchedule = await VariableSchedule.findOneAndUpdate(
+      { id: scheduleId },
+      { $push: { users_list: userEmail } },
+      {
+        new: true
+      }
     );
 
     const userVariableSchedule = {
-      id: variableSchedule.id,
-      hour_of_the_day: variableSchedule.hour_of_the_day,
-      day: variableSchedule.day
+      id: variableSchedule?.id,
+      hour_of_the_day: variableSchedule?.hour_of_the_day,
+      day: variableSchedule?.day
     };
 
     await User.findOneAndUpdate(
@@ -94,14 +92,12 @@ export const removeUserFromVariableSchedule = async (
   try {
     const { userEmail, scheduleId } = request.params;
 
-    const variableSchedule = new VariableSchedule(
-      await VariableSchedule.findOneAndUpdate(
-        { id: scheduleId },
-        { $pull: { users_list: userEmail } },
-        {
-          new: true
-        }
-      )
+    const variableSchedule = await VariableSchedule.findOneAndUpdate(
+      { id: scheduleId },
+      { $pull: { users_list: userEmail } },
+      {
+        new: true
+      }
     );
 
     await User.findOneAndUpdate(
