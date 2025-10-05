@@ -3,8 +3,7 @@ import { Router } from "express";
 import {
   addOrUpdateCanceledSchedule,
   deleteCanceledSchedule,
-  getCanceledSchedule,
-  removeUserFromCanceledSchedule
+  getCanceledSchedule
 } from "./canceledSchedulesController";
 
 const router = Router();
@@ -12,9 +11,5 @@ const router = Router();
 router.post("/", addOrUpdateCanceledSchedule);
 router.get("/:id", getCanceledSchedule);
 router.delete("/:id", deleteCanceledSchedule);
-router.put(
-  "/removeUser/:userEmail/FromCanceledSchedule/:scheduleId",
-  removeUserFromCanceledSchedule
-);
 
 export { router as canceledScheduleRouter };

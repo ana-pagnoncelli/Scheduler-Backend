@@ -1,6 +1,6 @@
 import request from "supertest";
 import { httpServer } from "../setupTests";
-import {  
+import {
   canceledScheduleDataWithOneUser,
   addCanceledScheduleData,
   addCanceledScheduleData2,
@@ -10,18 +10,19 @@ import {
 import { userData, userData2 } from "../users/fixtures";
 
 describe("Canceled Schedules", () => {
-
   describe("GET /:id ", () => {
     it("Should return the searched canceled schedule", async () => {
       // Create a user first
       await request(httpServer).post("/users").send(userData);
-      
+
       // Create a canceled schedule using the new addCanceledSchedule function
       await request(httpServer)
         .post("/canceledSchedules")
         .send(addCanceledScheduleData);
-        
-      const response = await request(httpServer).get("/canceledSchedules/2023-04-21_19:00");
+
+      const response = await request(httpServer).get(
+        "/canceledSchedules/2023-04-21_19:00"
+      );
       expect(response.body).toMatchObject(newCanceledScheduleExpected);
       expect(response.statusCode).toBe(200);
     });
@@ -31,42 +32,16 @@ describe("Canceled Schedules", () => {
     it("Should delete the canceled schedule", async () => {
       // Create a user first
       await request(httpServer).post("/users").send(userData);
-      
+
       // Create a canceled schedule
       await request(httpServer)
         .post("/canceledSchedules")
         .send(addCanceledScheduleData);
-        
-      const response = await request(httpServer).delete("/canceledSchedules/2023-04-21_19:00");
-      expect(response.statusCode).toBe(200);
-    });
-  });
-  describe("PUT removeUser/:userEmail/FromCanceledSchedule/:scheduleId ", () => {
-    it("Should update the canceled schedule and the user", async () => {
-      // Create users first
-      await request(httpServer).post("/users").send(userData);
-      await request(httpServer).post("/users").send(userData2);
-      
-      // Create a canceled schedule with both users
-      await request(httpServer)
-        .post("/canceledSchedules")
-        .send(addCanceledScheduleData);
-      await request(httpServer)
-        .post("/canceledSchedules")
-        .send(addCanceledScheduleData2);
-        
-      const response = await request(httpServer).put(
-        `/canceledSchedules/removeUser/${userData.email}/FromCanceledSchedule/2023-04-21_19:00`
+
+      const response = await request(httpServer).delete(
+        "/canceledSchedules/2023-04-21_19:00"
       );
-
-      expect(response.body).toMatchObject(canceledScheduleDataWithOneUser);
       expect(response.statusCode).toBe(200);
-
-      const userResponse = await request(httpServer).get(
-        `/users/${userData.email}`
-      );
-
-      expect(userResponse.body).toMatchObject(userData);
     });
   });
 
@@ -74,14 +49,16 @@ describe("Canceled Schedules", () => {
     it("Should create a new canceled schedule when no schedule exists for the given day and hour", async () => {
       // Create users first
       await request(httpServer).post("/users").send(userData);
-      
+
       const response = await request(httpServer)
         .post("/canceledSchedules")
         .send(addCanceledScheduleData);
 
       expect(response.statusCode).toBe(200);
       expect(response.body.day).toBe(newCanceledScheduleExpected.day);
-      expect(response.body.hour_of_the_day).toBe(newCanceledScheduleExpected.hour_of_the_day);
+      expect(response.body.hour_of_the_day).toBe(
+        newCanceledScheduleExpected.hour_of_the_day
+      );
       expect(response.body.id).toBe(newCanceledScheduleExpected.id);
       expect(response.body.users_list).toContain("test@test");
     });
@@ -90,7 +67,7 @@ describe("Canceled Schedules", () => {
       // Create users first
       await request(httpServer).post("/users").send(userData);
       await request(httpServer).post("/users").send(userData2);
-      
+
       // First, create a canceled schedule
       await request(httpServer)
         .post("/canceledSchedules")
@@ -103,7 +80,9 @@ describe("Canceled Schedules", () => {
 
       expect(response.statusCode).toBe(200);
       expect(response.body.day).toBe(existingCanceledScheduleExpected.day);
-      expect(response.body.hour_of_the_day).toBe(existingCanceledScheduleExpected.hour_of_the_day);
+      expect(response.body.hour_of_the_day).toBe(
+        existingCanceledScheduleExpected.hour_of_the_day
+      );
       expect(response.body.id).toBe(existingCanceledScheduleExpected.id);
       expect(response.body.users_list).toContain("test@test");
       expect(response.body.users_list).toContain("test@test2");

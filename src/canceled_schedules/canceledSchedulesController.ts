@@ -36,34 +36,6 @@ export const getCanceledSchedule = async (
   }
 };
 
-export const removeUserFromCanceledSchedule = async (
-  request: Request,
-  response: Response
-) => {
-  try {
-    const { userEmail, scheduleId } = request.params;
-
-    const canceledSchedule = new CanceledSchedule(
-      await CanceledSchedule.findOneAndUpdate(
-        { id: scheduleId },
-        { $pull: { users_list: userEmail } },
-        {
-          new: true
-        }
-      )
-    );
-
-    await User.findOneAndUpdate(
-      { email: userEmail },
-      { $pull: { canceled_schedules: { id: { $in: scheduleId } } } }
-    );
-
-    response.status(200).send(canceledSchedule);
-  } catch (error) {
-    response.status(500).send(error);
-  }
-};
-
 export const addOrUpdateCanceledSchedule = async (
   request: Request,
   response: Response
