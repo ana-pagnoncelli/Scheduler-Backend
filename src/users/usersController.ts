@@ -1,12 +1,6 @@
 /** source/controllers/posts.ts */
 import { Request, Response } from "express";
 import { User, UserType } from "./user";
-import {
-  findNearestDate,
-  mergeDateLists,
-  weekdaysToDates
-} from "../utils/date";
-import { WeekDay } from "../fixed_schedules/schedule";
 import { nextClass } from "./usersLogic";
 
 export const addUser = async (request: Request, response: Response) => {
