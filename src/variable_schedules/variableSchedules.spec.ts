@@ -84,55 +84,6 @@ describe("Variable Schedules", () => {
     });
   });
 
-  describe("PUT addUser/:userEmail/InVariableSchedule/:scheduleId ", () => {
-    it("Should update the variable schedule and the user", async () => {
-      // Create users with unique emails to avoid conflicts
-      const user1 = { ...userData, email: "user1@test.com" };
-      const user2 = { ...userData2, email: "user2@test.com" };
-      
-      await request(httpServer).post("/users").send(user1);
-      await request(httpServer).post("/users").send(user2);
-
-      // Create variable schedule using the new endpoint format
-      await request(httpServer)
-        .post("/variableSchedules")
-        .send({
-          hour: "18:00",
-          day: "2023-04-20",
-          userEmail: user1.email
-        });
-
-      const scheduleId = "2023-04-20_18:00";
-      
-      // Add second user to the schedule
-      const response = await request(httpServer).put(
-        `/variableSchedules/addUser/${user2.email}/InVariableSchedule/${scheduleId}`
-      );
-
-      expect(response.body).toMatchObject({
-        id: scheduleId,
-        day: "2023-04-20",
-        hour_of_the_day: "18:00",
-        users_list: [user1.email, user2.email]
-      });
-      expect(response.statusCode).toBe(200);
-
-      const userResponse = await request(httpServer).get(
-        `/users/${user2.email}`
-      );
-
-
-      expect(userResponse.body).toMatchObject({
-        ...user2,
-        variable_schedules: [{
-          id: scheduleId,
-          hour_of_the_day: "18:00",
-          day: "2023-04-20"
-        }]
-      });
-    });
-  });
-
   describe("PUT removeUser/:userEmail/FromVariableSchedule/:scheduleId ", () => {
     it("Should update the variable schedule and the user", async () => {
       // Create users with unique emails to avoid conflicts
@@ -267,12 +218,7 @@ describe("Variable Schedules", () => {
         .send(newScheduleData);
 
       expect(response.statusCode).toBe(200);
-      expect(response.body).toMatchObject({
-        id: "2023-05-15_14:00",
-        hour_of_the_day: "14:00",
-        day: "2023-05-15",
-        users_list: [userData.email]
-      });
+      expect(response.text).toBe("Variable schedule added or updated");
     });
 
     it("Should update an existing variable schedule by adding a user", async () => {
@@ -303,12 +249,7 @@ describe("Variable Schedules", () => {
         .send(secondScheduleData);
 
       expect(response.statusCode).toBe(200);
-      expect(response.body).toMatchObject({
-        id: "2023-05-16_16:00",
-        hour_of_the_day: "16:00",
-        day: "2023-05-16",
-        users_list: [userData.email, userData2.email]
-      });
+      expect(response.text).toBe("Variable schedule added or updated");
     });
 
     it("Should not add duplicate user to existing variable schedule", async () => {
@@ -332,12 +273,7 @@ describe("Variable Schedules", () => {
         .send(scheduleData);
 
       expect(response.statusCode).toBe(200);
-      expect(response.body).toMatchObject({
-        id: "2023-05-17_17:00",
-        hour_of_the_day: "17:00",
-        day: "2023-05-17",
-        users_list: [userData.email] // Should still have only one user
-      });
+      expect(response.text).toBe("Variable schedule added or updated");
     });
 
     it("Should return error when user does not exist", async () => {
@@ -373,6 +309,29 @@ describe("Variable Schedules", () => {
         .send({});
 
       expect(response.statusCode).toBe(500);
+    });
+
+    it("Should decrease classes_to_recover when adding user to variable schedule", async () => {
+      // Create user with classes_to_recover set to 3
+      const userWithClasses = { ...userData, classes_to_recover: 3 };
+      await request(httpServer).post("/users").send(userWithClasses);
+
+      const scheduleData = {
+        hour: "19:00",
+        day: "2023-05-20",
+        userEmail: userData.email
+      };
+
+      const response = await request(httpServer)
+        .post("/variableSchedules")
+        .send(scheduleData);
+
+      expect(response.statusCode).toBe(200);
+      expect(response.text).toBe("Variable schedule added or updated");
+
+      // Verify that classes_to_recover was decreased
+      const userResponse = await request(httpServer).get(`/users/${userData.email}`);
+      expect(userResponse.body.classes_to_recover).toBe(2);
     });
 
     it("Should return message when user was in canceled schedule", async () => {

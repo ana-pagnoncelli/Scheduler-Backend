@@ -3,7 +3,7 @@ import { VariableSchedule } from "./model";
 import { User } from "../users";
 import { getVariableScheduleInfo } from "./logic";
 import { handleAddOrUpdate } from "./service";
-import { checkIfUserExists } from "../users/service";
+import { checkIfUserExists, decreaseClassesToRecover } from "../users/service";
 import { userWasInCanceledSchedule } from "../canceled_schedules/service";
 
 export const updateVariableSchedule = async (
@@ -54,38 +54,6 @@ export const getVariableSchedule = async (
   }
 };
 
-export const addUserInVariableSchedule = async (
-  request: Request,
-  response: Response
-) => {
-  try {
-    const { userEmail, scheduleId } = request.params;
-
-    const variableSchedule = await VariableSchedule.findOneAndUpdate(
-      { id: scheduleId },
-      { $push: { users_list: userEmail } },
-      {
-        new: true
-      }
-    );
-
-    const userVariableSchedule = {
-      id: variableSchedule?.id,
-      hour_of_the_day: variableSchedule?.hour_of_the_day,
-      day: variableSchedule?.day
-    };
-
-    await User.findOneAndUpdate(
-      { email: userEmail },
-      { $push: { variable_schedules: userVariableSchedule } }
-    );
-
-    response.status(200).send(variableSchedule);
-  } catch (error) {
-    response.status(500).send(error);
-  }
-};
-
 export const removeUserFromVariableSchedule = async (
   request: Request,
   response: Response
@@ -117,15 +85,20 @@ export const addOrUpdateVariableSchedule = async (
   response: Response
 ) => {
   try {
+    let message = "";
     const variableScheduleInfo = getVariableScheduleInfo(request);
     await checkIfUserExists(variableScheduleInfo.userEmail);
 
     if (await userWasInCanceledSchedule(variableScheduleInfo)) {
-      response.status(200).send("User was removed from canceled schedule");
+      message = "User was removed from canceled schedule";
     } else {
-      const variableScheduleResponse = await handleAddOrUpdate(variableScheduleInfo);
-      response.status(200).send(variableScheduleResponse);
+      await handleAddOrUpdate(variableScheduleInfo);
+      message = "Variable schedule added or updated";
     }
+    
+    await decreaseClassesToRecover(variableScheduleInfo.userEmail);
+    response.status(200).send(message);
+
   } catch (error) {
     response.status(500).send(error);
   }
