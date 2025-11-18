@@ -1,7 +1,6 @@
 import request from "supertest";
 import { httpServer } from "../setupTests";
 import {
-  canceledScheduleDataWithOneUser,
   addCanceledScheduleData,
   addCanceledScheduleData2,
   newCanceledScheduleExpected,
@@ -61,6 +60,11 @@ describe("Canceled Schedules", () => {
       );
       expect(response.body.id).toBe(newCanceledScheduleExpected.id);
       expect(response.body.users_list).toContain("test@test");
+
+      // Verify that classes_to_recover was incremented
+      const userResponse = await request(httpServer).get("/users");
+      const user = userResponse.body.find((u: any) => u.email === "test@test");
+      expect(user.classes_to_recover).toBe(1);
     });
 
     it("Should add user to existing canceled schedule when schedule already exists for the given day and hour", async () => {
@@ -87,6 +91,13 @@ describe("Canceled Schedules", () => {
       expect(response.body.users_list).toContain("test@test");
       expect(response.body.users_list).toContain("test@test2");
       expect(response.body.users_list.length).toBe(2);
+
+      // Verify that classes_to_recover was incremented for both users
+      const userResponse = await request(httpServer).get("/users");
+      const user1 = userResponse.body.find((u: any) => u.email === "test@test");
+      const user2 = userResponse.body.find((u: any) => u.email === "test@test2");
+      expect(user1.classes_to_recover).toBe(1);
+      expect(user2.classes_to_recover).toBe(1);
     });
 
     it("Should return 500 when user does not exist", async () => {

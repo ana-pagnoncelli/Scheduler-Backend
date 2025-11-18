@@ -99,7 +99,7 @@ export const myScheduleInfo = async (
 
     const mySchedule = {
       nextClass: nextClass(referenceDate, user as UserType),
-      numberOfClassesToRecover: 2,
+      numberOfClassesToRecover: userData.classes_to_recover,
       fixedSchedulesDays: fixedSchedulesDays
     };
     response.status(200).send(mySchedule);

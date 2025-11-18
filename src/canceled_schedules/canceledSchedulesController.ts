@@ -6,7 +6,7 @@ import {
 import { User } from "../users";
 import { getCancelScheduleInfo } from "./logic";
 import { handleAddOrUpdate } from "./service";
-import { checkIfUserExists } from "../users/service";
+import { checkIfUserExists, increaseClassesToRecover } from "../users/service";
 
 export const deleteCanceledSchedule = async (
   request: Request,
@@ -46,6 +46,8 @@ export const addOrUpdateCanceledSchedule = async (
     await checkIfUserExists(cancelScheduleInfo.userEmail);
 
     const canceledScheduleResponse = await handleAddOrUpdate(cancelScheduleInfo);
+
+    await increaseClassesToRecover(cancelScheduleInfo.userEmail);
     
     response.send(canceledScheduleResponse);
     

@@ -4,7 +4,6 @@ import {
   updateVariableSchedule,
   deleteVariableSchedule,
   getVariableSchedule,
-  addUserInVariableSchedule,
   removeUserFromVariableSchedule,
   addOrUpdateVariableSchedule
 } from "./variableSchedulesController";
