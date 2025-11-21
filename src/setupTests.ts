@@ -1,10 +1,14 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
 import http from "http";
 import { router } from "./router.setup";
-import { uriTest } from "../database.config";
 
 let httpServer: http.Server;
 const PORT = 6060;
+
+dotenv.config({
+  path: ".env"
+});
 
 beforeAll(async () => {
   try {
@@ -32,7 +36,7 @@ beforeAll(async () => {
     });
 
     await serverPromise;
-    await mongoose.connect(uriTest);
+    await mongoose.connect(process.env.DATABASE_URL || "");
   } catch (error) {
     console.error("Failed to start test server:", error);
     throw error;
