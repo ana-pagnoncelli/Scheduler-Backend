@@ -1,9 +1,9 @@
 import { userData, userData2 } from "../users/fixtures";
-import { ScheduleType } from "./schedule";
+import { ScheduleType, WeekDay } from "./schedule";
 
 export const scheduleBaseData = {
   id: "1",
-  week_day: "MONDAY",
+  week_day: "MONDAY" as WeekDay,
   hour_of_the_day: "18:00",
   number_of_spots: 2
 };

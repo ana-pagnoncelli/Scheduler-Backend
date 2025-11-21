@@ -8,6 +8,7 @@ import {
 } from "./fixtures";
 import { userData, userData2 } from "../users/fixtures";
 import { addScheduleInUsers, removeScheduleFromUsers } from "./schedulesController";
+import { WeekDay } from "./schedule";
 
 describe("Schedules", () => {
   // Clean up database before each test
@@ -295,7 +296,7 @@ describe("Schedules", () => {
       const secondSchedule = {
         ...scheduleData,
         id: "2",
-        week_day: "TUESDAY",
+        week_day: "TUESDAY" as WeekDay,
         users_list: [userData.email]
       };
 
@@ -414,7 +415,7 @@ describe("Schedules", () => {
       const secondSchedule = {
         ...scheduleData,
         id: "2",
-        week_day: "TUESDAY",
+        week_day: "TUESDAY" as WeekDay,
         users_list: [userData.email]
       };
 
