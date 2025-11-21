@@ -36,12 +36,23 @@ beforeAll(async () => {
     });
 
     await serverPromise;
-    await mongoose.connect(process.env.DATABASE_URL || "");
+    
+    // Connect to MongoDB with timeout options
+    const dbUrl = process.env.DATABASE_URL || process.env.DATABASE_TEST_URL || "";
+    if (!dbUrl) {
+      throw new Error("DATABASE_URL or DATABASE_TEST_URL environment variable is not set");
+    }
+    
+    await mongoose.connect(dbUrl, {
+      serverSelectionTimeoutMS: 10000, // 10 seconds timeout
+      socketTimeoutMS: 10000,
+      connectTimeoutMS: 10000,
+    });
   } catch (error) {
     console.error("Failed to start test server:", error);
     throw error;
   }
-});
+}, 30000);
 
 afterAll(async () => {
   try {

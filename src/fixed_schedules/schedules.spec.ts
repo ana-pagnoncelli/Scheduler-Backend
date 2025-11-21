@@ -10,55 +10,41 @@ import { userData, userData2 } from "../users/fixtures";
 import { addScheduleInUsers, removeScheduleFromUsers } from "./schedulesController";
 import { WeekDay } from "./schedule";
 
+// Helper function to safely delete with timeout
+const safeDelete = async (url: string, timeout = 2000) => {
+  try {
+    await Promise.race([
+      request(httpServer).delete(url),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("Timeout")), timeout)
+      )
+    ]);
+  } catch (error) {
+    // Ignore errors - resource may not exist or request timed out
+  }
+};
+
 describe("Schedules", () => {
   // Clean up database before each test
   beforeEach(async () => {
-    // Clear all schedules and users before each test
-    try {
-      await request(httpServer).delete("/schedules/1");
-    } catch (error) {
-      // Schedule doesn't exist, which is fine
-    }
-    try {
-      await request(httpServer).delete("/schedules/2");
-    } catch (error) {
-      // Schedule doesn't exist, which is fine
-    }
-    try {
-      await request(httpServer).delete(`/users/${userData.email}`);
-    } catch (error) {
-      // User doesn't exist, which is fine
-    }
-    try {
-      await request(httpServer).delete(`/users/${userData2.email}`);
-    } catch (error) {
-      // User doesn't exist, which is fine
-    }
+    // Clear all schedules and users before each test (non-blocking)
+    await Promise.all([
+      safeDelete("/schedules/1"),
+      safeDelete("/schedules/2"),
+      safeDelete(`/users/${userData.email}`),
+      safeDelete(`/users/${userData2.email}`)
+    ]);
   });
 
   // Clean up database after each test
   afterEach(async () => {
-    // Clear all schedules and users after each test
-    try {
-      await request(httpServer).delete("/schedules/1");
-    } catch (error) {
-      // Schedule doesn't exist, which is fine
-    }
-    try {
-      await request(httpServer).delete("/schedules/2");
-    } catch (error) {
-      // Schedule doesn't exist, which is fine
-    }
-    try {
-      await request(httpServer).delete(`/users/${userData.email}`);
-    } catch (error) {
-      // User doesn't exist, which is fine
-    }
-    try {
-      await request(httpServer).delete(`/users/${userData2.email}`);
-    } catch (error) {
-      // User doesn't exist, which is fine
-    }
+    // Clear all schedules and users after each test (non-blocking)
+    await Promise.all([
+      safeDelete("/schedules/1"),
+      safeDelete("/schedules/2"),
+      safeDelete(`/users/${userData.email}`),
+      safeDelete(`/users/${userData2.email}`)
+    ]);
   });
 
   describe("POST / ", () => {
@@ -128,6 +114,9 @@ describe("Schedules", () => {
 
   describe("DELETE /:id ", () => {
     it("Should delete the schedule", async () => {
+      // First create a schedule to delete
+      await request(httpServer).post("/schedules").send(scheduleData);
+      
       const response = await request(httpServer).delete("/schedules/1");
       expect(response.statusCode).toBe(200);
     });
